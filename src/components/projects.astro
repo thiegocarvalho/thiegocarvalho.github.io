@@ -1,9 +1,8 @@
 ---
 import { Image } from "astro:assets";
-import svgl from "../../public/svgl.png";
-import stockin from "../../public/stockin.png";
-import moviesfordevs from "../../public/moviesfordevs.png";
-import tron from "../../public/tron.png";
+import cartucho from "../../public/cartucho2.png";
+import defiverso from "../../public/defiverso2.png";
+import vindi from "../../public/vindi.png";
 
 interface Project {
   title: string;
@@ -15,32 +14,32 @@ interface Project {
 
 const projects: Project[] = [
   {
-    title: "MoviesForDevs",
-    image: moviesfordevs as ImageMetadata,
-    link: "https://github.com/gothsec/MoviesForDevs",
-    preview: "https://movies-for-devs.vercel.app",
-    status: "On Development",
+    title: "Defiverso",
+    image: defiverso as ImageMetadata,
+    link: "https://defiverso.com",
+    preview: "https://defiverso.com",
+    status: "An educational platform that's integrates fiat and Web3 payments, mobile app, real-time notifications, event ticketing, and community management on Discord. The scalable architecture uses queues and messaging to handle large volumes of users and transactions",
   },
   {
-    title: "StockIn",
-    image: stockin as ImageMetadata,
+    title: "Cartucho",
+    image: cartucho as ImageMetadata,
     link: "https://github.com/gothsec/stockin-demo",
     preview: "https://stockin-demo.vercel.app",
-    status: "On Development",
+    status: "A retro game preservation project using IPFS for decentralized and censorship-resistant storage of ISOs and ROMs of old games. The solution ensures continuous access to games without relying on centralized servers, using blockchain for storage and distribution.",
   },
   {
-    title: "Svgl.app",
-    image: svgl as ImageMetadata,
+    title: "Vindi",
+    image: vindi as ImageMetadata,
     link: "https://github.com/pheralb/svgl",
     preview: "https://svgl.app",
-    status: "Contributor",
+    status: "Integration of the Vindi payment platform with the WordPress CMS, enabling recurring payments management for small and medium e-commerce stores. The solution ensures secure and efficient transaction processing.",
   },
   {
-    title: "Tron Legacy Web",
-    image: tron as ImageMetadata,
+    title: "DefiversoPay",
+    image: defiverso as ImageMetadata,
     link: "https://github.com/Gothsec/Tron-Legacy-web",
     preview: "https://tron-legacy-web.vercel.app/",
-    status: "Template (not official)",
+    status: "A Web3 payment system based on RPC connectivity with blockchain nodes. Decentralized and censorship-resistant, it enables secure transactions between users and platforms without intermediaries. The solution is designed to ensure scalability and security in transactions.",
   },
 ];
 ---
@@ -57,17 +56,12 @@ const projects: Project[] = [
       {
         projects.map((project) => (
           <div class="group">
-            <a
-              href={project.preview}
-              target="_blank"
-              rel="noopener noreferrer"
-              class="block"
-            >
+            
               <div class="rounded-2xl overflow-hidden shadow-lg hover:shadow-xl transition-shadow duration-300 mb-4">
                 <Image
                   src={project.image}
                   alt={project.title}
-                  class="w-full h-48 md:h-72 object-cover group-hover:scale-105 transition-transform duration-300"
+                  class="w-full h-48 md:h-72 group-hover:scale-105 transition-transform duration-300"
                 />
               </div>
               <div class="flex items-center px-3">
@@ -77,40 +71,8 @@ const projects: Project[] = [
                     {project.status}
                   </span>
                 </div>
-                <div class="flex gap-2 ml-auto">
-                  <a
-                    target="_blank"
-                    href={project.link}
-                    aria-label="GitHub"
-                    class="size-14 flex justify-center items-center text-[var(--white-icon)] hover:text-white transition duration-300 ease-in-out border border-1 border-[var(--white-icon-tr)] p-3 rounded-xl bg-[#1414149c] hover:bg-[var(--white-icon-tr)]"
-                  >
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      viewBox="0 0 24 24"
-                      fill="currentColor"
-                      class="size-7"
-                    >
-                      <path d="M24 12L18.3431 17.6569L16.9289 16.2426L21.1716 12L16.9289 7.75736L18.3431 6.34315L24 12ZM2.82843 12L7.07107 16.2426L5.65685 17.6569L0 12L5.65685 6.34315L7.07107 7.75736L2.82843 12ZM9.78845 21H7.66009L14.2116 3H16.3399L9.78845 21Z" />
-                    </svg>
-                  </a>
-                  <a
-                    target="_blank"
-                    href={project.preview}
-                    aria-label="Preview"
-                    class="size-14 flex justify-center items-center text-[var(--white-icon)] hover:text-white transition duration-300 ease-in-out border border-1 border-[var(--white-icon-tr)] p-3 rounded-xl bg-[#1414149c] hover:bg-[var(--white-icon-tr)]"
-                  >
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      viewBox="0 0 24 24"
-                      fill="currentColor"
-                      class="size-7"
-                    >
-                      <path d="M16.0037 9.41421L7.39712 18.0208L5.98291 16.6066L14.5895 8H7.00373V6H18.0037V17H16.0037V9.41421Z" />
-                    </svg>
-                  </a>
-                </div>
+                
               </div>
-            </a>
           </div>
         ))
       }
