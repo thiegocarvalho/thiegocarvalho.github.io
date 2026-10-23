@@ -18,7 +18,7 @@ it('renders the current role as Present, never as a doubled range', () => {
 });
 it('puts the current role first', () => {
   const html = readDist('index.html');
-  const first = html.indexOf('Chief Technology Officer');
+  const first = html.indexOf('On-Chain Immutable Certification');
   const last = html.indexOf('CENBRACOM');
   expect(first).toBeGreaterThan(-1);
   expect(first).toBeLessThan(last);
@@ -70,4 +70,12 @@ it('lists projects in one list with a tag on each, and ships no script', () => {
 it('declares no fixed width that can overflow a 320px viewport', () => {
   expect(allStyles()).not.toMatch(/\bwidth:\s*\d{4,}px/);
   expect(readDist('index.html')).toMatch(/name="viewport"[^>]*width=device-width/);
+});
+
+// The regression that started Task 6b: prose must follow the page's locale.
+it('serves English prose on / and Portuguese prose on /pt', () => {
+  expect(readDist('index.html')).not.toContain('Certificação Imutável On-Chain');
+  expect(readDist('pt/index.html')).toContain('Certificação Imutável On-Chain');
+  expect(readDist('pt/index.html')).not.toContain('Builder for an amnesic');
+  expect(readDist('index.html')).toContain('amnesic');
 });

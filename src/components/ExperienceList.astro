@@ -25,7 +25,7 @@ const entries = (await getCollection('experience')).sort((a, b) => a.data.order 
 <ol>
   {entries.map(({ data: e }) => (
     <li data-experience-entry>
-      <h3>{e.role}</h3>
+      <h3>{e.role[lang]}</h3>
       <p class="company">{e.company}</p>
       <p class="meta">
         <span>{range(e.start, e.end)}</span>
@@ -36,7 +36,7 @@ const entries = (await getCollection('experience')).sort((a, b) => a.data.order 
         ].filter(Boolean).join(' · ')}</span>
       </p>
       <ul class="highlights">
-        {e.highlights.map((h) => <li>{h}</li>)}
+        {e.highlights[lang].map((h) => <li>{h}</li>)}
       </ul>
       {e.skills.length > 0 && <p class="skills">{e.skills.join(' · ')}</p>}
     </li>

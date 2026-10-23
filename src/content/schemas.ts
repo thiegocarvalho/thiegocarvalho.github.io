@@ -2,15 +2,19 @@
 // content config. Kept free of `astro:content` so the Vitest runner resolves them.
 import { z } from 'astro/zod';
 
+// One value per locale. Shared fields (company, tag, skills, location) stay single-valued.
+export const localizedText = z.object({ en: z.string(), pt: z.string() });
+export const localizedList = z.object({ en: z.array(z.string()), pt: z.array(z.string()) });
+
 export const experienceSchema = z.object({
-  role: z.string(),
+  role: localizedText,
   company: z.string(),
   employment: z.enum(['full-time', 'contract', 'freelance', 'part-time']).optional(),
   start: z.coerce.date(),
   end: z.coerce.date().optional(), // absent = current
   location: z.string(),
   arrangement: z.enum(['on-site', 'hybrid', 'remote']).optional(),
-  highlights: z.array(z.string()),
+  highlights: localizedList,
   skills: z.array(z.string()).default([]),
   order: z.number(),
 });
@@ -21,7 +25,7 @@ export const projectSchema = z.object({
   tag: z.string(),
   url: z.string().optional(),
   repo: z.string().optional(),
-  summary: z.string(),
+  summary: localizedText,
   tech: z.array(z.string()),
   order: z.number(),
 });

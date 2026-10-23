@@ -16,7 +16,7 @@ const projects = (await getCollection('projects')).sort((a, b) => a.data.order -
   {projects.map(({ data: p }) => (
     <li data-project-entry>
       <h3>{p.name} <span data-project-tag>{p.tag}</span></h3>
-      <p>{p.summary}</p>
+      <p>{p.summary[lang]}</p>
       <p class="tech">{p.tech.join(' · ')}</p>
       <p class="links">
         {p.url && <a href={p.url}>{t('projects.live')}</a>}
