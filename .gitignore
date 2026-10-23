@@ -22,3 +22,6 @@ pnpm-debug.log*
 
 # build output
 dist/
+
+# local worktrees for isolated feature work
+.worktrees/
