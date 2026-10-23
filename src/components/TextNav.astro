@@ -25,6 +25,21 @@ const items = [
   { id: 'blog', href: localizePath('/blog/', lang), label: t('nav.blog') },
   { id: 'contact', href: `${home}#contact`, label: t('nav.contact') },
 ];
+
+/*
+ * The language switch. Without it the site is bilingual only to crawlers:
+ * hreflang tells Google the other version exists, but a visitor on / has no
+ * way to reach /pt at all.
+ *
+ * It targets the counterpart of the current page when that page exists in
+ * both locales, and otherwise the other locale's home. A post written in one
+ * language only has no counterpart, so sending the visitor to a URL that was
+ * never built would turn a missing translation into a 404.
+ */
+const other: Lang = lang === 'en' ? 'pt' : 'en';
+const logical = Astro.url.pathname.replace(/^\/pt(?=\/|$)/, '') || '/';
+const mirrored = logical === '/' || logical === '/blog/' || logical === '/blog';
+const switchHref = localizePath(mirrored ? logical : '/', other);
 ---
 
 <nav data-text-nav aria-label={t('nav.label')}>
@@ -32,6 +47,11 @@ const items = [
     {items.map((i) => (
       <li><a href={i.href} aria-current={current === i.id ? 'page' : undefined}>{i.label}</a></li>
     ))}
+    <li data-lang-switch>
+      <a href={switchHref} hreflang={other === 'pt' ? 'pt-br' : 'en'} lang={other === 'pt' ? 'pt-br' : 'en'}>
+        {other === 'pt' ? 'Português' : 'English'}
+      </a>
+    </li>
   </ul>
 </nav>
 
@@ -52,5 +72,8 @@ const items = [
     box-shadow: inset 1px 1px 0 var(--color-bevel-light), inset -1px -1px 0 var(--color-bevel-dark);
   }
   a:hover, a[aria-current] { color: var(--color-accent-cyan); }
+  [data-lang-switch] { margin-inline-start: auto; }
+  [data-lang-switch] a { color: var(--color-ink-muted); text-transform: none; }
+  [data-lang-switch] a:hover { color: var(--color-accent-cyan); }
   a:focus-visible { outline: 2px solid var(--color-accent-magenta); outline-offset: 2px; }
 </style>

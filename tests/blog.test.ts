@@ -15,9 +15,14 @@ it('shows the empty state on the English index, which has only a draft', () => {
 // Review Focus 1: a post in one locale only
 it('never advertises an hreflang alternate for a translation that does not exist', () => {
   const html = readDist('pt/blog/arquitetura-de-pagamentos-hibridos/index.html');
-  expect(html).not.toMatch(/hreflang="en"/);
-  expect(html).not.toMatch(/hreflang="x-default"/);
-  expect(html).toMatch(/hreflang="pt-br"/);
+  // Scoped to <link rel="alternate">, which is the declaration search engines
+  // read as "the same document in another language". An hreflang attribute on
+  // an <a> is a different thing -- it describes the language of whatever that
+  // link points at -- and the language switch legitimately carries one.
+  const alternates = [...html.matchAll(/<link rel="alternate"[^>]*>/g)].map((m) => m[0]).join('');
+  expect(alternates).not.toMatch(/hreflang="en"/);
+  expect(alternates).not.toMatch(/hreflang="x-default"/);
+  expect(alternates).toMatch(/hreflang="pt-br"/);
   expect(html).not.toMatch(/href="https:\/\/thiegocarvalho\.github\.io\/blog\//);
 });
 it('lists an untranslated post only under its own locale', () => {
