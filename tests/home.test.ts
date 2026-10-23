@@ -43,10 +43,17 @@ it('exposes contact as mailto and the four social links, with no form', () => {
   }
 });
 
-it('states the real location and role', () => {
+it('leads with the headline as the title, and keeps the job title in the career section', () => {
+  // His LinkedIn headline is what the site leads with; "CTO & Partner" is a
+  // job title and belongs beside the job it describes, not in the hero.
   const html = readDist('index.html');
   expect(html).toContain('Osasco/SP');
-  expect(html).toContain('CTO &amp; Partner, Defiverso');
+  expect(html).toMatch(/<h1[^>]*>Software Architect &amp; Engineer<\/h1>/);
+  // Scoped to the visible hero. The meta description still names his current
+  // role, which is the right copy for a search snippet.
+  const hero = html.slice(html.indexOf('<body'), html.indexOf('data-text-nav'));
+  expect(hero).not.toMatch(/CTO/);
+  expect(html.slice(html.indexOf('id="career"'))).toMatch(/CTO &amp; Partner/);
 });
 
 it('renders the about prose in each locale', () => {

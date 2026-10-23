@@ -10,8 +10,12 @@ export const ui = {
     'blog.empty': 'Nothing written here yet.',
     'experience.present': 'Present',
     'nav.label': 'Sections',
-    'hero.headline': 'Software Architect & Engineer | Distributed Systems & High Concurrency | Fintech, Payment Infrastructure & Web3 | Cloud Architecture & Event-Driven Systems',
-    'hero.role': 'CTO & Partner, Defiverso',
+    // His LinkedIn headline is the title the site leads with. The current job
+    // title belongs to the career section, beside the job it describes.
+    // Split at the headline's own pipes; nothing here is invented.
+    'hero.title': 'Software Architect & Engineer',
+    'hero.headline':
+      'Distributed Systems & High Concurrency · Fintech, Payment Infrastructure & Web3 · Cloud Architecture & Event-Driven Systems',
     'arrangement.on-site': 'On-site',
     'arrangement.hybrid': 'Hybrid',
     'arrangement.remote': 'Remote',
@@ -33,8 +37,9 @@ export const ui = {
     'blog.empty': 'Nada escrito aqui ainda.',
     'experience.present': 'Atual',
     'nav.label': 'Seções',
-    'hero.headline': 'Arquiteto & Engenheiro de Software | Sistemas Distribuídos & Alta Concorrência | Fintech, Infraestruturas de Pagamento & Web3 | Arquitetura Cloud & Sistemas Orientados a Eventos',
-    'hero.role': 'CTO e sócio, Defiverso',
+    'hero.title': 'Arquiteto & Engenheiro de Software',
+    'hero.headline':
+      'Sistemas Distribuídos & Alta Concorrência · Fintech, Infraestruturas de Pagamento & Web3 · Arquitetura Cloud & Sistemas Orientados a Eventos',
     'arrangement.on-site': 'Presencial',
     'arrangement.hybrid': 'Híbrido',
     'arrangement.remote': 'Remoto',
