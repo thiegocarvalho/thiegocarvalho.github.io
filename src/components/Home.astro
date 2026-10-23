@@ -2,6 +2,7 @@
 /** The whole home page, shared by both locale routes so they cannot drift. */
 import Base from '../layouts/Base.astro';
 import Window from './Window.astro';
+import DeskPoster from './DeskPoster.astro';
 import TextNav from './TextNav.astro';
 import ExperienceList from './ExperienceList.astro';
 import ProjectList from './ProjectList.astro';
@@ -20,6 +21,7 @@ const t = useTranslations(lang);
 ---
 
 <Base title='Thiego "Zeru" Carvalho' description={description} lang={lang} path="/">
+  <DeskPoster />
   <main>
     <Window title='Thiego "Zeru" Carvalho' id="top" tone="accent">
       <h1>{t('hero.role')}</h1>
