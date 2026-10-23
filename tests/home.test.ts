@@ -1,9 +1,14 @@
 import { allStyles, readDist } from './helpers/dist';
 
+// Count elements carrying a data attribute, not mentions of it: a bundled or
+// inlined stylesheet legitimately names the attribute in its selectors.
+const countAttr = (html: string, attr: string) =>
+  (html.replace(/<style[\s\S]*?<\/style>/g, '').match(new RegExp(`<[a-z][^>]*\\s${attr}(?=[\\s=>/])`, 'g')) ?? []).length;
+
 it('renders all 13 positions on each locale home page', () => {
   for (const page of ['index.html', 'pt/index.html']) {
     const html = readDist(page);
-    expect(html.match(/data-experience-entry/g) ?? []).toHaveLength(13);
+    expect(countAttr(html, 'data-experience-entry')).toBe(13);
   }
 });
 
@@ -61,8 +66,8 @@ it('always renders the text navigation, pointing at every section', () => {
 it('lists projects in one list with a tag on each, and ships no script', () => {
   for (const page of ['index.html', 'pt/index.html']) {
     const html = readDist(page);
-    expect(html.match(/data-project-entry/g) ?? []).toHaveLength(6);
-    expect(html.match(/data-project-tag/g) ?? []).toHaveLength(6);
+    expect(countAttr(html, 'data-project-entry')).toBe(6);
+    expect(countAttr(html, 'data-project-tag')).toBe(6);
     expect(html).not.toMatch(/<script/);
   }
 });

@@ -13,7 +13,24 @@ const projects = defineCollection({
 });
 
 const posts = defineCollection({
-  loader: glob({ pattern: '**/*.{md,mdx}', base: './src/content/posts' }),
+  loader: glob({
+    pattern: '**/*.{md,mdx}',
+    base: './src/content/posts',
+    // Fold diacritics so ids (and therefore URLs) are ASCII: "híbridos" -> "hibridos".
+    generateId: ({ entry }) =>
+      entry
+        .replace(/\.(md|mdx)$/, '')
+        .split('/')
+        .map((seg) =>
+          seg
+            .normalize('NFD')
+            .replace(/[\u0300-\u036f]/g, '')
+            .toLowerCase()
+            .replace(/[^a-z0-9]+/g, '-')
+            .replace(/^-|-$/g, ''),
+        )
+        .join('/'),
+  }),
   schema: postSchema,
 });
 

@@ -1,0 +1,45 @@
+---
+/** One post page. Alternates are limited to the locales the post exists in. */
+import { render, type CollectionEntry } from 'astro:content';
+import Base from '../layouts/Base.astro';
+import Window from './Window.astro';
+import TextNav from './TextNav.astro';
+import SiteFooter from './SiteFooter.astro';
+import type { Lang } from '../i18n/ui';
+
+interface Props {
+  lang: Lang;
+  slug: string;
+  post: CollectionEntry<'posts'>;
+  availableLangs: Lang[];
+}
+const { lang, slug, post, availableLangs } = Astro.props;
+const { Content } = await render(post);
+const fmt = new Intl.DateTimeFormat(lang === 'pt' ? 'pt-BR' : 'en-GB', { dateStyle: 'long', timeZone: 'UTC' });
+---
+
+<Base
+  title={`${post.data.title} — Thiego "Zeru" Carvalho`}
+  description={post.data.description}
+  lang={lang}
+  path={`/blog/${slug}/`}
+  availableLangs={availableLangs}
+>
+  <main>
+    <Window title={post.data.title} id="post">
+      <h1>{post.data.title}</h1>
+      <time datetime={post.data.pubDate.toISOString()}>{fmt.format(post.data.pubDate)}</time>
+      <div class="prose"><Content /></div>
+    </Window>
+    <TextNav lang={lang} current="blog" />
+  </main>
+  <SiteFooter lang={lang} />
+</Base>
+
+<style>
+  h1 { margin: 0 0 4px; font-family: var(--font-pixel); font-size: 1.125rem; font-weight: 400; color: var(--color-accent-cyan); }
+  time { display: block; margin-bottom: 12px; font-size: 0.875rem; color: var(--color-ink-muted); }
+  .prose :global(h2) { margin: 16px 0 6px; font-family: var(--font-pixel); font-size: 1rem; font-weight: 400; }
+  .prose :global(p) { margin: 0 0 10px; overflow-wrap: anywhere; }
+  .prose :global(a) { color: var(--color-accent-cyan); }
+</style>
