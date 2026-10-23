@@ -1,1 +1,43 @@
 @import "tailwindcss";
+
+/*
+ * Night City, by way of Windows 3.11: graphite and black, cyan and magenta
+ * accents. Tokens are named by role, not hue. `static` keeps every token in the
+ * output even when no utility references it yet.
+ */
+@theme static {
+  --color-void: #050507;
+  --color-surface: #1b1c21;
+  --color-surface-raised: #25272e;
+  --color-bevel-light: #6b6f7b;
+  --color-bevel-dark: #08080a;
+  --color-ink: #dfe2ea;
+  --color-ink-muted: #9aa0ae;
+  --color-accent-cyan: #19e3ff;
+  --color-accent-magenta: #ff2bd6;
+
+  /* Pixel display face for chrome and headings; plain sans for reading. */
+  --font-pixel: "Silkscreen", "VT323", ui-monospace, "Courier New", monospace;
+  --font-body: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+
+  --spacing-bevel: 2px;
+}
+
+html {
+  background: var(--color-void);
+  color: var(--color-ink);
+  font-family: var(--font-body);
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  padding: 16px;
+  overflow-wrap: anywhere;
+  /* Two-pixel scanlines, hard-edged. */
+  background-image: repeating-linear-gradient(
+    to bottom,
+    transparent 0 2px,
+    rgb(0 0 0 / 0.35) 2px 3px
+  );
+}
