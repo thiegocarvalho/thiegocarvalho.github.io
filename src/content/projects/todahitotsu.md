@@ -1,6 +1,5 @@
 ---
 name: "Toda Hitotsu"
-status: "public"
 kind: work
 tag: "ipfs"
 repo: "https://github.com/thiegocarvalho/todahitotsu"

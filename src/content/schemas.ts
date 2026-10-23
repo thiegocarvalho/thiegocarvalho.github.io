@@ -17,7 +17,6 @@ export const experienceSchema = z.object({
 
 export const projectSchema = z.object({
   name: z.string(),
-  status: z.string(),
   kind: z.enum(['work', 'personal']),
   tag: z.string(),
   url: z.string().optional(),

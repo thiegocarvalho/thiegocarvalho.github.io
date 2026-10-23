@@ -1,6 +1,5 @@
 ---
 name: "Cartucho // IPFS"
-status: "public"
 kind: personal
 tag: "for fun"
 url: "https://thiegocarvalho.github.io/cartucho/"

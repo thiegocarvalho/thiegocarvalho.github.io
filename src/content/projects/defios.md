@@ -1,6 +1,5 @@
 ---
 name: "DefiOS"
-status: "public"
 kind: work
 tag: "security"
 repo: "https://github.com/thiegocarvalho/defios"

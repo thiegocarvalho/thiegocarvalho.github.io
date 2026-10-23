@@ -1,6 +1,5 @@
 ---
 name: "Vindi Anti-Fraud"
-status: "public"
 kind: work
 tag: "payments"
 repo: "https://github.com/thiegocarvalho/anti-fraude-vindi"

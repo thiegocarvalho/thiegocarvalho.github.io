@@ -1,6 +1,5 @@
 ---
 name: "GramoVoice Studio"
-status: "public"
 kind: work
 tag: "local-first"
 repo: "https://github.com/thiegocarvalho/gramovoice"

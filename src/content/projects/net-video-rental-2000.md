@@ -1,6 +1,5 @@
 ---
 name: "Net Video Rental 2000"
-status: "public"
 kind: personal
 tag: "for fun"
 repo: "https://github.com/thiegocarvalho/net-video-rental-2000"
