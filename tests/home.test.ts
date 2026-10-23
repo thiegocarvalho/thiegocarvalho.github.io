@@ -55,11 +55,13 @@ it('renders the about prose in each locale', () => {
 });
 
 it('always renders the text navigation, pointing at every section', () => {
-  for (const page of ['index.html', 'pt/index.html']) {
+  // Section links carry the locale's home path rather than a bare hash, so
+  // that the same nav still resolves from /blog/. See tests/nav.test.ts.
+  for (const [page, home] of [['index.html', '/'], ['pt/index.html', '/pt/']] as const) {
     const html = readDist(page);
     expect(html).toMatch(/<nav[^>]*data-text-nav/);
     for (const id of ['career', 'projects', 'about', 'contact'])
-      expect(html).toContain(`href="#${id}"`);
+      expect(html, `${page} ${id}`).toContain(`href="${home}#${id}"`);
   }
 });
 

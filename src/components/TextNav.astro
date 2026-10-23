@@ -14,12 +14,16 @@ interface Props {
 }
 const { lang, current } = Astro.props;
 const t = useTranslations(lang);
+// Section links carry the home path, not a bare hash: on the home page the
+// browser still just scrolls, but from /blog/ a bare "#career" would point at
+// a section that is not on the page and silently do nothing.
+const home = localizePath('/', lang);
 const items = [
-  { id: 'career', href: '#career', label: t('nav.career') },
-  { id: 'projects', href: '#projects', label: t('nav.projects') },
-  { id: 'about', href: '#about', label: t('nav.about') },
+  { id: 'career', href: `${home}#career`, label: t('nav.career') },
+  { id: 'projects', href: `${home}#projects`, label: t('nav.projects') },
+  { id: 'about', href: `${home}#about`, label: t('nav.about') },
   { id: 'blog', href: localizePath('/blog/', lang), label: t('nav.blog') },
-  { id: 'contact', href: '#contact', label: t('nav.contact') },
+  { id: 'contact', href: `${home}#contact`, label: t('nav.contact') },
 ];
 ---
 
