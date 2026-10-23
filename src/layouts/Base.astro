@@ -1,5 +1,12 @@
 ---
 import '../styles/global.css';
+// Self-hosted fonts: a cross-origin Google Fonts stylesheet is render-blocking
+// and its late font swap caused layout shift (measured in Lighthouse).
+import '@fontsource/silkscreen/latin-400.css';
+import '@fontsource/ibm-plex-sans/latin-400.css';
+import '@fontsource/ibm-plex-sans/latin-600.css';
+import silkscreenUrl from '@fontsource/silkscreen/files/silkscreen-latin-400-normal.woff2?url';
+import plexUrl from '@fontsource/ibm-plex-sans/files/ibm-plex-sans-latin-400-normal.woff2?url';
 import { alternatesFor, htmlLang, localizePath } from '../i18n/utils';
 import type { Lang } from '../i18n/ui';
 
@@ -37,12 +44,8 @@ const alternates = alternatesFor(path, availableLangs);
     <meta name="twitter:title" content={title} />
     <meta name="twitter:description" content={description} />
     <link rel="sitemap" href="/sitemap-index.xml" />
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      rel="stylesheet"
-      href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;600&family=Silkscreen&display=swap"
-    />
+    <link rel="preload" href={silkscreenUrl} as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href={plexUrl} as="font" type="font/woff2" crossorigin />
   </head>
   <body>
     <slot />

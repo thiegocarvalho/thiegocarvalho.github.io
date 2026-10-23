@@ -46,6 +46,9 @@ jobs:
         run: pnpm install --frozen-lockfile
       - name: Build
         run: pnpm build
+      - name: Test built output
+        # Build already ran above; assert over that exact artifact instead of rebuilding.
+        run: SKIP_TEST_BUILD=1 pnpm test
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
