@@ -1,0 +1,73 @@
+import { allStyles, readDist } from './helpers/dist';
+
+it('renders all 13 positions on each locale home page', () => {
+  for (const page of ['index.html', 'pt/index.html']) {
+    const html = readDist(page);
+    expect(html.match(/data-experience-entry/g) ?? []).toHaveLength(13);
+  }
+});
+
+// Review Focus 3
+it('renders the current role as Present, never as a doubled range', () => {
+  const html = readDist('index.html');
+  expect(html).toMatch(/2024\s*(—|–|-)\s*Present/);
+  expect(html).not.toMatch(/Present\s*(—|–|-)\s*Present/);
+  const pt = readDist('pt/index.html');
+  expect(pt).toMatch(/2024\s*(—|–|-)\s*Atual/);
+  expect(pt).not.toMatch(/Atual\s*(—|–|-)\s*Atual/);
+});
+it('puts the current role first', () => {
+  const html = readDist('index.html');
+  const first = html.indexOf('Chief Technology Officer');
+  const last = html.indexOf('CENBRACOM');
+  expect(first).toBeGreaterThan(-1);
+  expect(first).toBeLessThan(last);
+});
+
+it('exposes contact as mailto and the four social links, with no form', () => {
+  for (const page of ['index.html', 'pt/index.html']) {
+    const html = readDist(page);
+    expect(html).toContain('mailto:thiego@rocketmail.com');
+    for (const url of [
+      'https://github.com/thiegocarvalho',
+      'https://www.linkedin.com/in/thiegocarvalho/',
+      'https://x.com/unusual_zeru',
+      'https://www.instagram.com/unusual_zeru/',
+    ]) expect(html).toContain(url);
+    expect(html).not.toMatch(/<form/);
+  }
+});
+
+it('states the real location and role', () => {
+  const html = readDist('index.html');
+  expect(html).toContain('Osasco/SP');
+  expect(html).toContain('CTO &amp; Partner, Defiverso');
+});
+
+it('renders the about prose in each locale', () => {
+  expect(readDist('index.html')).toContain('1998');
+  expect(readDist('pt/index.html')).toContain('1998');
+});
+
+it('always renders the text navigation, pointing at every section', () => {
+  for (const page of ['index.html', 'pt/index.html']) {
+    const html = readDist(page);
+    expect(html).toMatch(/<nav[^>]*data-text-nav/);
+    for (const id of ['career', 'projects', 'about', 'contact'])
+      expect(html).toContain(`href="#${id}"`);
+  }
+});
+
+it('lists projects in one list with a tag on each, and ships no script', () => {
+  for (const page of ['index.html', 'pt/index.html']) {
+    const html = readDist(page);
+    expect(html.match(/data-project-entry/g) ?? []).toHaveLength(6);
+    expect(html.match(/data-project-tag/g) ?? []).toHaveLength(6);
+    expect(html).not.toMatch(/<script/);
+  }
+});
+
+it('declares no fixed width that can overflow a 320px viewport', () => {
+  expect(allStyles()).not.toMatch(/\bwidth:\s*\d{4,}px/);
+  expect(readDist('index.html')).toMatch(/name="viewport"[^>]*width=device-width/);
+});

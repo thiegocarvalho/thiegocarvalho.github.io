@@ -1,0 +1,49 @@
+---
+import { getCollection } from 'astro:content';
+import { useTranslations } from '../i18n/utils';
+import type { Lang } from '../i18n/ui';
+
+interface Props {
+  lang: Lang;
+}
+const { lang } = Astro.props;
+const t = useTranslations(lang);
+// One list, ordered by what each entry demonstrates; the tag carries the nature.
+const projects = (await getCollection('projects')).sort((a, b) => a.data.order - b.data.order);
+---
+
+<ul>
+  {projects.map(({ data: p }) => (
+    <li data-project-entry>
+      <h3>{p.name} <span data-project-tag>{p.tag}</span></h3>
+      <p>{p.summary}</p>
+      <p class="tech">{p.tech.join(' · ')}</p>
+      <p class="links">
+        {p.url && <a href={p.url}>{t('projects.live')}</a>}
+        {p.repo && <a href={p.repo}>{t('projects.source')}</a>}
+      </p>
+    </li>
+  ))}
+</ul>
+
+<style>
+  ul { list-style: none; margin: 0; padding: 0; }
+  li { padding: 12px 0; border-top: 1px dashed var(--color-bevel-light); }
+  li:first-child { border-top: 0; padding-top: 0; }
+  h3 { margin: 0 0 4px; font-size: 1rem; font-weight: 600; }
+  [data-project-tag] {
+    display: inline-block;
+    margin-left: 4px;
+    padding: 0 6px;
+    font-family: var(--font-pixel);
+    font-size: 0.6875rem;
+    text-transform: uppercase;
+    color: var(--color-accent-magenta);
+    border: 1px solid var(--color-accent-magenta);
+    border-radius: 0;
+  }
+  p { margin: 0 0 6px; }
+  .tech { color: var(--color-ink-muted); font-size: 0.8125rem; }
+  .links { display: flex; gap: 14px; }
+  a { color: var(--color-accent-cyan); }
+</style>

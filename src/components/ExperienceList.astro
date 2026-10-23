@@ -1,0 +1,56 @@
+---
+import { getCollection } from 'astro:content';
+import { useTranslations } from '../i18n/utils';
+import type { Lang } from '../i18n/ui';
+
+interface Props {
+  lang: Lang;
+}
+const { lang } = Astro.props;
+const t = useTranslations(lang);
+
+const MONTHS = {
+  en: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+  pt: ['jan', 'fev', 'mar', 'abr', 'mai', 'jun', 'jul', 'ago', 'set', 'out', 'nov', 'dez'],
+}[lang];
+const fmt = (d: Date) => `${MONTHS[d.getUTCMonth()]} ${d.getUTCFullYear()}`;
+
+// A missing `end` is the ongoing role; it is shown once, as the end of the range.
+const range = (start: Date, end?: Date) =>
+  `${fmt(start)} — ${end ? fmt(end) : t('experience.present')}`;
+
+const entries = (await getCollection('experience')).sort((a, b) => a.data.order - b.data.order);
+---
+
+<ol>
+  {entries.map(({ data: e }) => (
+    <li data-experience-entry>
+      <h3>{e.role}</h3>
+      <p class="company">{e.company}</p>
+      <p class="meta">
+        <span>{range(e.start, e.end)}</span>
+        <span>{[
+          e.employment && t(`employment.${e.employment}`),
+          e.arrangement && t(`arrangement.${e.arrangement}`),
+          e.location,
+        ].filter(Boolean).join(' · ')}</span>
+      </p>
+      <ul class="highlights">
+        {e.highlights.map((h) => <li>{h}</li>)}
+      </ul>
+      {e.skills.length > 0 && <p class="skills">{e.skills.join(' · ')}</p>}
+    </li>
+  ))}
+</ol>
+
+<style>
+  ol { list-style: none; margin: 0; padding: 0; }
+  li[data-experience-entry] { padding: 12px 0; border-top: 1px dashed var(--color-bevel-light); }
+  li[data-experience-entry]:first-child { border-top: 0; padding-top: 0; }
+  h3 { margin: 0; font-size: 1rem; font-weight: 600; }
+  .company { margin: 0; color: var(--color-accent-cyan); font-weight: 600; }
+  .meta { margin: 2px 0 8px; display: flex; flex-wrap: wrap; gap: 2px 12px; color: var(--color-ink-muted); font-size: 0.875rem; }
+  .highlights { margin: 0; padding-left: 1.1rem; }
+  .highlights li { margin-bottom: 6px; }
+  .skills { margin: 6px 0 0; color: var(--color-ink-muted); font-size: 0.8125rem; }
+</style>

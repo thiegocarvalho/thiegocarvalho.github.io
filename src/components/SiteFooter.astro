@@ -1,0 +1,18 @@
+---
+import { useTranslations } from '../i18n/utils';
+import type { Lang } from '../i18n/ui';
+
+const t = useTranslations(Astro.props.lang);
+interface Props {
+  lang: Lang;
+}
+---
+
+<footer>
+  <p>Thiego "Zeru" Carvalho · Osasco/SP — Brazil · {t('footer.rights')}</p>
+</footer>
+
+<style>
+  footer { max-width: 48rem; margin: 0 auto; color: var(--color-ink-muted); font-size: 0.8125rem; text-align: center; }
+  p { margin: 0; }
+</style>
