@@ -93,4 +93,12 @@ describe('transition and drive CSS', () => {
     // global reduced-motion rule still kills every animation, including the sequence
     expect(css).toMatch(/prefers-reduced-motion:\s*reduce\)\s*\{\s*\*[\s\S]*?animation:\s*none\s*!important/);
   });
+
+  it('shows the disk lying flat and fully inside the front-loading drive, with real thickness, no rounded corners', () => {
+    expect(css).toMatch(/\.insert[^{]*\.tilt[^{]*\{[^}]*rotateX\(68deg\)/);
+    expect(css).toMatch(/\.insert\[[^\]]+\]\{[^}]*translateY\(calc\(var\(--w\) \* -\.8\)\)/);
+    const html = readDist('projects/gramovoice/index.html');
+    expect((html.match(/class="[^"]*\bedge\b/g) ?? []).length).toBe(5);
+    expect(css).not.toMatch(/\.floppy\{[^}]*border-radius/);
+  });
 });

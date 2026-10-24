@@ -44,7 +44,14 @@ const Inner = href ? 'a' : 'div';
     aria-current={href && index === start ? 'true' : undefined}
     aria-label={href ? `${name}, ${tag} (${index + 1} ${t('projects.of')} ${total})` : undefined}
   >
-    <span class="floppy" aria-hidden="true">
+    <span class="tilt" aria-hidden="true">
+    <span class="face back"></span>
+    <span class="face edge e-r"></span>
+    <span class="face edge e-l"></span>
+    <span class="face edge e-t"></span>
+    <span class="face edge e-b"></span>
+    <span class="face edge e-c"></span>
+    <span class="floppy">
       <span class="print">3.5″<br />HD</span>
       <span class="shutter"><span class="window"></span></span>
       <span class="label">
@@ -52,6 +59,7 @@ const Inner = href ? 'a' : 'div';
         <span class="tagline">{tag}</span>
       </span>
       <span class="notch"></span>
+    </span>
     </span>
   </Inner>
 </Outer>
@@ -67,10 +75,10 @@ const Inner = href ? 'a' : 'div';
     .slot { margin-inline: 8px; }
   }
   .slot.standalone { margin-inline: 0; }
+  .slot { --disk: #2f4a6b; --band: var(--color-accent-cyan); }
 
   .disk {
     display: block;
-    border-radius: 4px;
     filter: drop-shadow(0 0 0.5px rgb(255 255 255 / 0.5)) drop-shadow(0 18px 18px rgb(0 0 0 / 0.65));
   }
   /*
@@ -80,7 +88,7 @@ const Inner = href ? 'a' : 'div';
    * stays at 1, the finished fan.
    */
   @media (scripting: enabled) {
-    .disk {
+    .tilt {
       --f: var(--fan, 1);
       --k: calc(1 - var(--f));
       transform-origin: 50% 70%;
@@ -89,28 +97,70 @@ const Inner = href ? 'a' : 'div';
         rotate(calc(var(--k) * var(--o) * 4deg))
         rotateY(calc(var(--o) * var(--f) * -32deg))
         scale(calc(1 - var(--a) * var(--f) * 0.12));
-      filter: brightness(calc(1 - var(--a) * var(--f) * 0.3 - var(--a) * var(--k) * 0.12))
-        drop-shadow(0 0 0.5px rgb(255 255 255 / 0.5)) drop-shadow(0 18px 18px rgb(0 0 0 / 0.65));
       will-change: transform;
     }
+    .disk {
+      filter: brightness(calc(1 - var(--a) * var(--fan, 1) * 0.3 - var(--a) * (1 - var(--fan, 1)) * 0.12))
+        drop-shadow(0 0 0.5px rgb(255 255 255 / 0.5)) drop-shadow(0 18px 18px rgb(0 0 0 / 0.65));
+    }
+  }
+
+  /*
+   * Thickness (3.3 mm on a 90 mm body, 3.7%). The view-transition-name on
+   * .disk flattens its children, so the 3D lives one level down in .tilt: the
+   * front face, a back plate and four edge strips share one 3D space and the
+   * fan's rotateY shows the side edge as dark plastic.
+   */
+  .tilt {
+    --t: calc(var(--w) * 0.037);
+    --edge: color-mix(in srgb, var(--disk), black 58%);
+    position: relative;
+    display: block;
+    transform-style: preserve-3d;
+  }
+  .tilt > .floppy { transform: translateZ(calc(var(--t) / 2)); }
+  .face { position: absolute; display: block; backface-visibility: hidden; }
+  .back {
+    inset: 0;
+    transform: translateZ(calc(var(--t) / -2)) rotateY(180deg);
+    backface-visibility: visible;
+    background: var(--edge);
+    clip-path: polygon(0 0, 88% 0, 100% 12%, 100% 100%, 0 100%);
+  }
+  .edge { background: linear-gradient(var(--edge), color-mix(in srgb, var(--edge), black 35%)); backface-visibility: visible; }
+  .e-r, .e-l { top: 12%; bottom: 0; width: var(--t); transform: rotateY(90deg); }
+  .e-l { top: 0; left: calc(var(--t) / -2); }
+  .e-r { right: calc(var(--t) / -2); }
+  .e-t, .e-b { left: 0; width: 88%; height: var(--t); transform: rotateX(90deg); }
+  .e-t { top: calc(var(--t) / -2); }
+  .e-b { width: 100%; bottom: calc(var(--t) / -2); }
+  /* the one chamfered corner, top right: 12% x 12% of the body, so 0.1697 long */
+  .e-c {
+    left: 88%;
+    top: calc(var(--t) / -2);
+    width: calc(var(--w) * 0.1697);
+    height: var(--t);
+    transform-origin: 0 50%;
+    transform: rotate(45deg) rotateX(90deg);
   }
 
   /* The floppy. Everything is sized in cqw so it scales with the disk. */
   .floppy {
-    --disk: #2f4a6b;
-    --band: var(--color-accent-cyan);
     position: relative;
     display: block;
     aspect-ratio: 1;
     container-type: inline-size;
-    background: linear-gradient(150deg, color-mix(in srgb, var(--disk), white 14%), var(--disk) 55%);
+    background:
+      linear-gradient(118deg, rgb(255 255 255 / 0.2), rgb(255 255 255 / 0.04) 32%, transparent 33%, rgb(0 0 0 / 0.14)),
+      linear-gradient(150deg, color-mix(in srgb, var(--disk), white 14%), var(--disk) 55%);
+    box-shadow: inset 0 0 0 0.7cqw rgb(0 0 0 / 0.28), inset 0.9cqw 0.9cqw 0 rgb(255 255 255 / 0.1);
     clip-path: polygon(0 0, 88% 0, 100% 12%, 100% 100%, 0 100%);
   }
-  [data-variant='1'] .floppy { --disk: #6b2f5e; --band: var(--color-accent-magenta); }
-  [data-variant='2'] .floppy { --disk: #3f4350; --band: var(--color-hazard); }
-  [data-variant='3'] .floppy { --disk: #1f6b73; --band: var(--color-accent-magenta); }
-  [data-variant='4'] .floppy { --disk: #7a6a1c; --band: var(--color-accent-cyan); }
-  [data-variant='5'] .floppy { --disk: #3a6b3a; --band: var(--color-hazard); }
+  [data-variant='1'] { --disk: #6b2f5e; --band: var(--color-accent-magenta); }
+  [data-variant='2'] { --disk: #3f4350; --band: var(--color-hazard); }
+  [data-variant='3'] { --disk: #1f6b73; --band: var(--color-accent-magenta); }
+  [data-variant='4'] { --disk: #7a6a1c; --band: var(--color-accent-cyan); }
+  [data-variant='5'] { --disk: #3a6b3a; --band: var(--color-hazard); }
 
   .print {
     position: absolute;
@@ -130,9 +180,10 @@ const Inner = href ? 'a' : 'div';
     top: 0;
     width: 54cqw;
     height: 31cqw;
-    background: linear-gradient(90deg, #8d929d, #e6e9ee 28%, #b4b9c3 62%, #8a8f9a);
-    border-radius: 0 0 1.5cqw 1.5cqw;
-    box-shadow: inset 0 -1cqw 0 rgb(0 0 0 / 0.18);
+    background:
+      repeating-linear-gradient(90deg, rgb(255 255 255 / 0.1) 0 0.3cqw, transparent 0.3cqw 0.8cqw),
+      linear-gradient(90deg, #8d929d, #e6e9ee 28%, #b4b9c3 62%, #8a8f9a);
+    box-shadow: inset 0 -1cqw 0 rgb(0 0 0 / 0.18), 0 1.2cqw 1.6cqw rgb(0 0 0 / 0.5), 0 0 0 0.3cqw rgb(0 0 0 / 0.25);
   }
   .window {
     position: absolute;
@@ -141,7 +192,6 @@ const Inner = href ? 'a' : 'div';
     width: 11cqw;
     height: 21cqw;
     background: #101217;
-    border-radius: 1cqw;
     box-shadow: inset 0.8cqw 0.8cqw 0 rgb(0 0 0 / 0.6);
   }
   .label {
@@ -159,8 +209,7 @@ const Inner = href ? 'a' : 'div';
       linear-gradient(var(--band) 0 0) top / 100% 5cqw no-repeat,
       repeating-linear-gradient(transparent 0 7.2cqw, rgb(40 70 120 / 0.28) 7.2cqw 7.6cqw),
       #f5efd9;
-    border-radius: 0.8cqw;
-    box-shadow: 0 0.6cqw 1.2cqw rgb(0 0 0 / 0.35);
+    box-shadow: 0 0.6cqw 1.2cqw rgb(0 0 0 / 0.35), inset 0 0 0 0.3cqw rgb(255 255 255 / 0.55), 0 0 0 0.4cqw rgb(0 0 0 / 0.3);
   }
   .name {
     display: block;
