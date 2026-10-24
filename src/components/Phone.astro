@@ -1,12 +1,13 @@
 ---
 /**
  * An 80s brick cell phone standing beside the contact call to action, after
- * the classic DynaTAC, built from the shared 3D box kit (global.css). The
- * front is not flat: an off-white frame (the head with the earpiece, two side
- * rails and the bottom lip) stands proud, and the grey-blue key panel sits
- * recessed inside it, reached by a chin that curves in under the earpiece and
- * a flare that sweeps back out to the lip at the bottom. The antenna rises
- * from the top.
+ * the Motorola DynaTAC 8000X, built from the shared 3D box kit (global.css).
+ * Its side is the real profile, all straight cuts and square corners: the
+ * head leans back a little, a chin cuts in under the earpiece, the key
+ * section runs straight and sunk, a flare cuts back out and a short foot
+ * closes it. The front is five planes on that profile, an off-white rim
+ * around the grey-blue face: earpiece grille on the head, red LED display on
+ * the chin, keys on the middle, mic slot on the flare. Antenna at the back.
  *
  * A toy: pressing the keys "dials" them, the digits run across the display
  * with each key's touch tone, and after a pause it goes back to its idle text.
@@ -22,16 +23,14 @@ const keys = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '*', '0', '#'];
     <span class="box brick">
       <i class="tp"></i><i class="sd"></i>
       <i class="head"><b class="ear"></b></i>
-      <i class="rail"></i><i class="rail r"></i><i class="well"></i>
-      <i class="chin"></i>
-      <i class="panel">
-        <b class="lcd">ZERU//</b>
+      <i class="chin"><b class="lcd">ZERU//</b></i>
+      <i class="mid">
         <b class="pad">
           {keys.map((k) => <button type="button" tabindex="-1">{k}</button>)}
         </b>
       </i>
       <i class="flare"></i>
-      <i class="lip"></i>
+      <i class="foot"></i>
     </span>
   </div>
 </div>
@@ -65,69 +64,76 @@ const keys = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '*', '0', '#'];
 </script>
 
 <style is:global>
-  /* global but every rule starts at .phone: scoping attributes would cost ~500 bytes here */
   /*
-   * Sizes in cqw of .phone. The body is 30 wide, 104 tall, 36 deep; the panel
-   * sits 2.5 behind the frame. Front, top to bottom: head 0-22, chin 22-30
-   * (leaning back 17.4deg over 8.38), panel 30-84, flare 84-94 (leaning out
-   * 14deg over 10.31), lip 94-104. Rails are 3.5 wide.
+   * Global, but every rule starts at .phone (scoping attributes would cost
+   * ~500 bytes). Sizes in cqw of .phone; the body is 30 wide, 104 tall, 43
+   * deep. The front profile, measured off a side view (z back from the head's
+   * face, y down): head (0,0)-(3.5,23.2), chin to (7.8,37.1), middle straight
+   * to (7.8,83.8), flare out to (0,95.2), foot to (0,104). Each front plane
+   * hangs from its top edge, pushed back to its depth and leaned by
+   * atan(dz/dy).
    */
   .phone { container-type: inline-size; width: 100%; max-width: min(21rem, 60vw); filter: drop-shadow(0 20px 18px rgb(0 0 0 / 0.6)); }
   .phone .set {
     position: relative;
     width: 30cqw;
     height: 104cqw;
-    margin: 46cqw 0 6cqw 26cqw;
+    margin: 40cqw 0 6cqw 24cqw;
     transform-style: preserve-3d;
     transform: perspective(1600px) rotateX(-10deg) rotateY(-30deg);
+    /* the invisible 3D planes would catch the clicks meant for the sunk keys */
+    pointer-events: none;
   }
-  .phone .brick { inset: 0; --d: 36cqw; }
-  /* the invisible 3D planes would catch the clicks meant for the recessed keys */
-  .phone .set { pointer-events: none; }
   .phone .pad button { pointer-events: auto; }
-  .phone .brick > .sd { background: linear-gradient(90deg, #d6cfbf, #a8a192); }
-  .phone .brick > .tp { background: #f4efe3; border-radius: 6cqw 6cqw 0 0; }
-  .phone .head, .phone .rail, .phone .lip { background: linear-gradient(90deg, #f1ebdd, #e2dccd); }
-  .phone .head { left: 0; top: 0; width: 100%; height: 22cqw; border-radius: 6cqw 6cqw 0 0; container-type: inline-size; }
-  .phone .rail { left: 0; top: 22cqw; width: 3.5cqw; height: 72cqw; }
-  .phone .rail.r { left: auto; right: 0; }
-  /* the inner wall of the left rail, seen looking into the recess */
-  .phone .well { left: 3.5cqw; top: 22cqw; width: 2.5cqw; height: 72cqw; transform-origin: 0 50%; transform: rotateY(90deg); background: #bdb6a6; }
-  .phone .chin, .phone .panel, .phone .flare { left: 3.5cqw; width: 23cqw; transform-origin: 50% 0; }
-  .phone .chin { top: 22cqw; height: 8.38cqw; transform: rotateX(-17.4deg); background: linear-gradient(#8f98a1, #a3acb5); }
-  .phone .panel { top: 30cqw; height: 54cqw; transform: translateZ(-2.5cqw); background: linear-gradient(90deg, #aab3bc, #9aa3ac); container-type: inline-size; }
-  .phone .flare { top: 84cqw; height: 10.31cqw; transform: translateZ(-2.5cqw) rotateX(14deg); background: radial-gradient(#3a3d40 0 3cqw, #0000 3.4cqw) 50% 60% / 22% 18% no-repeat, linear-gradient(#a3acb5, #c3cad1); }
-  .phone .lip { left: 0; top: 94cqw; width: 100%; height: 10cqw; border-radius: 0 0 2cqw 2cqw; }
-  /* the antenna: a thin grey rod from the middle of the top */
-  .phone .ant { left: 44%; top: -44cqw; width: 2.4cqw; height: 44cqw; --d: 2.4cqw; transform: translateZ(-16cqw); }
-  .phone .ant i { background: #8b9096; }
+  .phone .brick { inset: 0; --d: 43cqw; }
+  .phone .brick > .tp { background: #f3f0e8; }
+  .phone .brick > .sd {
+    background: linear-gradient(90deg, #d9d5ca, #b4afa3);
+    clip-path: polygon(0 0, 8.1% 22.3%, 18.1% 35.7%, 18.1% 80.6%, 0 91.5%, 0 100%, 100% 100%, 100% 0);
+  }
+  /* front planes: an off-white rim either side of the grey-blue face */
+  .phone .head, .phone .chin, .phone .mid, .phone .flare, .phone .foot {
+    left: 0;
+    width: 100%;
+    box-sizing: border-box;
+    transform-origin: 50% 0;
+    border: 0 solid #ebe7dc;
+    border-width: 0 2.6cqw;
+    background: #a6afb8;
+    container-type: inline-size;
+  }
+  .phone .head {
+    top: 0;
+    height: 23.46cqw;
+    transform: rotateX(-8.58deg);
+    border-top-width: 3cqw;
+  }
+  /* the earpiece grille: a small square cluster of holes */
+  .phone .ear { inset: 22% 32% 34%; background: radial-gradient(#3e4246 32%, #0000 38%) 0 0 / 25% 25%; }
+  .phone .chin { top: 23.2cqw; height: 14.55cqw; transform: translateZ(-3.5cqw) rotateX(-17.19deg); background: #959ea7; }
+  .phone .mid { top: 37.1cqw; height: 46.7cqw; transform: translateZ(-7.8cqw); }
+  .phone .flare { top: 83.8cqw; height: 13.81cqw; transform: translateZ(-7.8cqw) rotateX(34.38deg); background: linear-gradient(#3a3d40 0 0) 50% 55% / 22% 9% no-repeat, #b9c1c9; }
+  .phone .foot { top: 95.2cqw; height: 8.8cqw; transform: none; background: #ebe7dc; }
+  /* the antenna: a black rod on a squat base, near the back */
+  .phone .ant { left: 38%; top: -40cqw; width: 2.2cqw; height: 40cqw; --d: 2.2cqw; transform: translateZ(-34cqw); }
+  .phone .ant i { background: #1c1c1f; }
 
   .phone b { display: block; position: absolute; }
-  /* earpiece: a grey cup in the head with a grille of holes */
-  .phone .ear {
-    inset: 14% 12% 10%;
-    border-radius: 12cqw 12cqw 4cqw 4cqw;
-    padding: 18cqw 22cqw;
-    background: radial-gradient(#3e4246 1.6cqw, #0000 2cqw) 50% / 9cqw 9cqw content-box, #a3acb5;
-    box-shadow: inset 0 2cqw 3cqw rgb(0 0 0 / 0.35);
-  }
   .phone .lcd {
-    inset: 5% 8% auto;
-    height: 11%;
-    display: grid !important;
+    inset: 22% 6%;
+    display: grid;
     place-items: center;
     background: #151a18;
     font: 12cqw/1 var(--font-pixel);
     color: #ff3b30;
     text-shadow: 0 0 2cqw #ff3b30;
   }
-  .phone .pad { inset: 22% 9% 4% 6%; display: grid !important; grid: repeat(4, 1fr) / repeat(3, 1fr); gap: 5cqw 7cqw; }
+  .phone .pad { inset: 5% 4%; display: grid; grid: repeat(4, 1fr) / repeat(3, 1fr); gap: 6cqw 7cqw; }
   .phone .pad button {
     display: grid;
     place-items: center;
     padding: 0;
     border: 0;
-    border-radius: 3cqw;
     background: linear-gradient(#f4f5f6, #d3d6da);
     box-shadow: 0 1.4cqw 0 #6b7179;
     font: 700 11cqw/1 var(--font-body);
