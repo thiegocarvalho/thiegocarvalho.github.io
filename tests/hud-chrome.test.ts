@@ -6,7 +6,8 @@ describe('HUD panel markup', () => {
   it('renders each panel as a real <section> labelled by its heading', () => {
     // Replaces the Win3.11 window-markup assertion: the invariant is semantic structure, not bevels.
     const sections = [...page().matchAll(/<section\b[^>]*\bdata-panel\b[^>]*>([\s\S]*?)<\/section>/g)];
-    expect(sections.length).toBe(2); // changed: home is blog + projects (contact is the footer CTA)
+    // home is blog + projects, plus the activity graph when the build had data (contact is the footer CTA)
+    expect(sections.length).toBe(page().includes('id="activity"') ? 3 : 2);
     for (const m of sections) {
       expect(m[0]).toMatch(/aria-labelledby="([^"]+)"/);
       expect(m[1]).toMatch(/<h2\b[^>]*>\s*[^<\s][^<]*<\/h2>/);

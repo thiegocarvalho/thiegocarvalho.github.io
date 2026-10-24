@@ -6,6 +6,7 @@ import Panel from './Panel.astro';
 import Hero from './Hero.astro';
 import TextNav from './TextNav.astro';
 import FloppyCarousel from './FloppyCarousel.astro';
+import ContributionGraph from './ContributionGraph.astro';
 import SiteFooter from './SiteFooter.astro';
 import { localizePath, useTranslations } from '../i18n/utils';
 import type { Lang } from '../i18n/ui';
@@ -58,6 +59,7 @@ const fmt = new Intl.DateTimeFormat(lang === 'pt' ? 'pt-BR' : 'en-GB', { dateSty
     <Panel title={t('nav.projects')} id="projects" index="02" label={`${projects} ${t('hud.disks')}`}>
       <FloppyCarousel lang={lang} />
     </Panel>
+    <ContributionGraph lang={lang} />
   </main>
   <SiteFooter lang={lang} />
 </Base>

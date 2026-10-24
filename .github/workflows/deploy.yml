@@ -9,6 +9,11 @@ on:
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
 
+  # Daily rebuild so the home page's GitHub contribution graph stays current.
+  # Schedules run from the repository's default branch only.
+  schedule:
+    - cron: "17 6 * * *"
+
 # Sets permissions of the GITHUB_TOKEN to allow deployment to GitHub Pages
 permissions:
   contents: read
@@ -46,6 +51,9 @@ jobs:
         run: pnpm install --frozen-lockfile
       - name: Build
         run: pnpm build
+        env:
+          # Read-only use: the contribution calendar for the home page graph.
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Test built output
         # Build already ran above; assert over that exact artifact instead of rebuilding.
         run: SKIP_TEST_BUILD=1 pnpm test

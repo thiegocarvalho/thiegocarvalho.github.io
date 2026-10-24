@@ -71,11 +71,12 @@ it('renders the about prose on the profile page in each locale', () => {
 });
 
 // Changed: the blog section now sits between hero and projects.
-it('keeps home to hero, blog, projects and contact', () => {
+it('keeps home to hero, blog, projects, the activity graph when built with data, and contact', () => {
   for (const page of ['index.html', 'pt/index.html']) {
     const html = readDist(page);
     const ids = [...html.matchAll(/<section\b[^>]*\bid="([^"]+)"/g)].map((m) => m[1]);
-    expect(ids, page).toEqual(['top', 'blog', 'projects', 'contact']);
+    const activity = ids.includes('activity') ? ['activity'] : [];
+    expect(ids, page).toEqual(['top', 'blog', 'projects', ...activity, 'contact']);
   }
 });
 
