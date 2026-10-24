@@ -67,6 +67,19 @@ button:focus-visible,
 }
 
 /*
+ * The 3D hardware kit (CRT, phone): a .box is a block in 3D space and its
+ * <i> children are the faces the camera sees, a front (.fr), a top (.tp)
+ * hinged back from the top edge and a right side (.sd) hinged back from the
+ * right edge, --d deep. Beige plastic lit from the top left.
+ */
+.box { position: absolute; display: block; transform-style: preserve-3d; }
+.box > i { position: absolute; display: block; }
+.box > .fr { inset: 0; }
+.sd { left: 100%; top: 0; width: var(--d); height: 100%; transform-origin: 0 50%; transform: rotateY(90deg); background: linear-gradient(90deg, #a49e87, #7f7a66); }
+.tp { left: 0; bottom: 100%; width: 100%; height: var(--d); transform-origin: 50% 100%; transform: rotateX(90deg); background: linear-gradient(0deg, #ebe5d1, #d6cfb9); }
+.fr { background: linear-gradient(#cfc8b2, #aca58f); }
+
+/*
  * CRT scan reveal: as a section enters the viewport a bright scanline sweeps
  * down it and paints it in (clip-path follows the line), opening with a brief
  * RGB-split flicker. Scroll-driven and one-shot: the keyframes only exist
