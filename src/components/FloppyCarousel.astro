@@ -9,7 +9,7 @@
  */
 import { getCollection } from 'astro:content';
 import Floppy from './Floppy.astro';
-import { useTranslations } from '../i18n/utils';
+import { localizePath, useTranslations } from '../i18n/utils';
 import type { Lang } from '../i18n/ui';
 
 interface Props {
@@ -27,7 +27,7 @@ const start = Math.floor((total - 1) / 2);
 <div data-carousel data-of={t('projects.of')} role="region" aria-roledescription="carousel" aria-label={t('projects.region')}>
   <ol class="track" data-track tabindex="0" aria-label={t('projects.track')}>
     {projects.map(({ id, data: p }, i) => (
-      <Floppy lang={lang} slug={id} name={p.name} tag={p.tag} index={i} total={total} start={start} href={`#project-${id}`} />
+      <Floppy lang={lang} slug={id} name={p.name} tag={p.tag} index={i} total={total} start={start} href={localizePath(`/projects/${id}/`, lang)} />
     ))}
   </ol>
 
@@ -53,6 +53,7 @@ const start = Math.floor((total - 1) / 2);
         <p class="links">
           {p.url && <a href={p.url}>{t('projects.live')} ↗</a>}
           {p.repo && <a href={p.repo}>{t('projects.source')} ↗</a>}
+          <a class="open" href={localizePath(`/projects/${id}/`, lang)}>{t('projects.open')} →</a>
         </p>
       </article>
     ))}
@@ -119,6 +120,9 @@ const start = Math.floor((total - 1) / 2);
     root.querySelector('[data-next]')!.addEventListener('click', () => go(goal + 1));
     disks.forEach((disk, i) =>
       disk.addEventListener('click', (e) => {
+        // The centred disk is the open one: let the link navigate (mouse click
+        // and keyboard Enter alike). A side disk first slides to the centre.
+        if (i === current) return;
         e.preventDefault();
         go(i);
       }),

@@ -89,6 +89,35 @@ button:focus-visible,
 }
 
 /*
+ * Cross-document view transitions: a plain link navigation between two pages
+ * of this site morphs elements that share a view-transition-name (the floppy
+ * disk, `disk-<slug>`, on the home carousel and in the project page's drive)
+ * and crossfades the rest. Browsers without support just navigate. Off under
+ * reduced motion.
+ */
+@media (prefers-reduced-motion: no-preference) {
+  @view-transition {
+    navigation: auto;
+  }
+}
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation-duration: 0.4s;
+}
+/* The disk's flight: a deliberate, eased glide rather than a jump. */
+::view-transition-group(*.disk) {
+  animation-duration: 0.55s;
+  animation-timing-function: cubic-bezier(0.45, 0, 0.15, 1);
+  z-index: 10;
+}
+::view-transition-old(*.disk),
+::view-transition-new(*.disk) {
+  animation-duration: 0.55s;
+  height: 100%;
+  object-fit: contain;
+}
+
+/*
  * Decorative motion is off for visitors who asked for less of it. Content does
  * not depend on any animation or transition, so collapsing them to an instant
  * change loses nothing but the flourish.
