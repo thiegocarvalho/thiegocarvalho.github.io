@@ -148,3 +148,22 @@ describe('blog section on home', () => {
     for (const page of ['index.html', 'pt/index.html']) expect(readDist(page)).not.toContain('hello-world');
   });
 });
+
+describe('pixel icons in contact', () => {
+  it('draws five crisp, decorative, currentColor icons beside visible text labels', () => {
+    for (const page of ['index.html', 'pt/index.html']) {
+      const html = readDist(page);
+      const svgs = [...html.matchAll(/<svg class="pixel-icon[^>]*>/g)].map((m) => m[0]);
+      expect(svgs.length, page).toBe(5);
+      for (const s of svgs) {
+        expect(s).toContain('shape-rendering="crispEdges"');
+        expect(s).toContain('fill="currentColor"');
+        expect(s).toContain('aria-hidden="true"');
+      }
+      for (const label of ['GitHub', 'LinkedIn', 'Instagram'])
+        expect(html, label).toMatch(new RegExp(`<a [^>]*rel="me noopener"[^>]*><svg[\\s\\S]*?<span[^>]*>${label}</span></a>`));
+      expect(html).toMatch(/<span[^>]*>X<\/span><\/a>/);
+      expect(html).toMatch(/mailto:thiego@rocketmail\.com"[^>]*><svg[\s\S]*?<span[^>]*>thiego@rocketmail\.com<\/span>/);
+    }
+  });
+});

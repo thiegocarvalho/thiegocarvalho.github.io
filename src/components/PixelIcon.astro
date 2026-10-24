@@ -1,0 +1,94 @@
+---
+/**
+ * Pixel-art icons on a 12x12 grid. The bitmaps are text, the SVG path is
+ * built from them at build time (one rect per run of pixels), so the icons
+ * stay crisp at any size and take their colour from `currentColor`. Always
+ * decorative: the link that holds one carries the visible text label.
+ */
+interface Props {
+  name: 'mail' | 'github' | 'linkedin' | 'x' | 'instagram';
+}
+
+const bitmaps: Record<Props['name'], string[]> = {
+  mail: [
+    '............',
+    '............',
+    '############',
+    '##........##',
+    '#.##....##.#',
+    '#..##..##..#',
+    '#...####...#',
+    '#....##....#',
+    '#..........#',
+    '#..........#',
+    '############',
+    '............',
+  ],
+  github: [
+    '.##......##.',
+    '.###....###.',
+    '.##########.',
+    '############',
+    '##..####..##',
+    '##..####..##',
+    '############',
+    '.##########.',
+    '..########..',
+    '...######...',
+    '..##....##..',
+    '..##....##..',
+  ],
+  linkedin: [
+    '.##########.',
+    '############',
+    '##.#########',
+    '############',
+    '##.##....###',
+    '##.##.##.###',
+    '##.##.##.###',
+    '##.##.##.###',
+    '##.##.##.###',
+    '############',
+    '############',
+    '.##########.',
+  ],
+  x: [
+    '##........##',
+    '###......###',
+    '.###....###.',
+    '..###..###..',
+    '...######...',
+    '....####....',
+    '....####....',
+    '...######...',
+    '..###..###..',
+    '.###....###.',
+    '###......###',
+    '##........##',
+  ],
+  instagram: [
+    '.##########.',
+    '#..........#',
+    '#.......##.#',
+    '#...####...#',
+    '#..##..##..#',
+    '#..#....#..#',
+    '#..#....#..#',
+    '#..##..##..#',
+    '#...####...#',
+    '#..........#',
+    '#..........#',
+    '.##########.',
+  ],
+};
+
+const d = bitmaps[Astro.props.name]
+  .flatMap((row, y) => [...row.matchAll(/#+/g)].map((m) => `M${m.index} ${y}h${m[0].length}v1h-${m[0].length}z`))
+  .join('');
+---
+
+<svg class="pixel-icon" viewBox="0 0 12 12" width="20" height="20" shape-rendering="crispEdges" fill="currentColor" aria-hidden="true" focusable="false"><path d={d} /></svg>
+
+<style>
+  .pixel-icon { flex: none; display: block; }
+</style>

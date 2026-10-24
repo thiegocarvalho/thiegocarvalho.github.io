@@ -1,20 +1,24 @@
 ---
-const links = [
-  { label: 'GitHub', href: 'https://github.com/thiegocarvalho' },
-  { label: 'LinkedIn', href: 'https://www.linkedin.com/in/thiegocarvalho/' },
-  { label: 'X', href: 'https://x.com/unusual_zeru' },
-  { label: 'Instagram', href: 'https://www.instagram.com/unusual_zeru/' },
+import PixelIcon from './PixelIcon.astro';
+
+const links: { icon: 'github' | 'linkedin' | 'x' | 'instagram'; label: string; href: string }[] = [
+  { icon: 'github', label: 'GitHub', href: 'https://github.com/thiegocarvalho' },
+  { icon: 'linkedin', label: 'LinkedIn', href: 'https://www.linkedin.com/in/thiegocarvalho/' },
+  { icon: 'x', label: 'X', href: 'https://x.com/unusual_zeru' },
+  { icon: 'instagram', label: 'Instagram', href: 'https://www.instagram.com/unusual_zeru/' },
 ];
 ---
 
 <ul>
-  {links.map((l) => <li><a href={l.href} rel="me noopener">{l.label}</a></li>)}
+  {links.map((l) => <li><a href={l.href} rel="me noopener"><PixelIcon name={l.icon} /><span>{l.label}</span></a></li>)}
 </ul>
 
 <style>
   ul { display: flex; flex-wrap: wrap; gap: 8px; list-style: none; margin: 0; padding: 0; }
   a {
-    display: block;
+    display: flex;
+    align-items: center;
+    gap: 10px;
     padding: 10px 16px;
     font-family: var(--font-pixel);
     font-size: 0.75rem;
@@ -24,5 +28,5 @@ const links = [
     color: var(--color-ink);
     border: 1px solid var(--color-line-bright);
   }
-  a:hover { color: var(--color-void); background: var(--color-accent-cyan); border-color: var(--color-accent-cyan); }
+  a:hover, a:focus-visible { color: var(--color-void); background: var(--color-accent-cyan); border-color: var(--color-accent-cyan); }
 </style>
