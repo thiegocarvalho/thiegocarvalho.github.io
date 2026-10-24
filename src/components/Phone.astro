@@ -2,12 +2,15 @@
 /**
  * An 80s brick cell phone standing beside the contact call to action, after
  * the classic DynaTAC: a tall body from the shared 3D box kit (global.css),
- * its front carrying the earpiece grille, a red LED display, the number keys,
- * the function keys and the mouthpiece; the antenna rises from the top.
- * Decorative only, no script.
+ * its front carrying the earpiece grille, a red LED display, the number keys
+ * and the mouthpiece; the antenna rises from the top.
+ *
+ * A toy: pressing the keys "dials" them, the digits run across the display
+ * with each key's touch tone, and after a pause it goes back to its idle text.
+ * Hidden from assistive tech and out of the tab order; without script the
+ * keys simply do nothing.
  */
 const keys = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '*', '0', '#'];
-const fns = ['MCL', 'CLA', 'SND', 'STO', 'RCL', 'END', 'FCN', 'LCL', 'VOL'];
 ---
 
 <div class="phone" aria-hidden="true">
@@ -19,8 +22,7 @@ const fns = ['MCL', 'CLA', 'SND', 'STO', 'RCL', 'END', 'FCN', 'LCL', 'VOL'];
         <b class="ear"></b>
         <b class="lcd">ZERU//</b>
         <b class="pad">
-          {keys.map((k) => <b>{k}</b>)}
-          {fns.map((k) => <b class:list={['fn', { snd: k === 'SND' }]}>{k}</b>)}
+          {keys.map((k) => <button type="button" tabindex="-1">{k}</button>)}
         </b>
         <b class="mic"></b>
       </i>
@@ -28,13 +30,41 @@ const fns = ['MCL', 'CLA', 'SND', 'STO', 'RCL', 'END', 'FCN', 'LCL', 'VOL'];
   </div>
 </div>
 
+<script is:inline type="module" data-phone>
+  // dial: digits run across the display with each key's touch tone (DTMF), idle text back after 3s
+  const p = document.querySelector('.phone'), l = p.querySelector('.lcd'), idle = l.textContent;
+  let n = '', t, a;
+  p.addEventListener('click', (e) => {
+    const k = e.target.closest('button');
+    if (!k) return;
+    const d = k.textContent, i = '123456789*0#'.indexOf(d);
+    l.textContent = n = (n + d).slice(-8);
+    clearTimeout(t);
+    t = setTimeout(() => (l.textContent = idle, n = ''), 3000);
+    try {
+      a ??= new AudioContext();
+      const g = a.createGain(), T = a.currentTime;
+      g.gain.setValueAtTime(0.06, T);
+      g.gain.exponentialRampToValueAtTime(0.001, T + 0.16);
+      g.connect(a.destination);
+      for (const f of [[697, 770, 852, 941][(i / 3) | 0], [1209, 1336, 1477][i % 3]]) {
+        const o = a.createOscillator();
+        o.frequency.value = f;
+        o.connect(g);
+        o.start(T);
+        o.stop(T + 0.16);
+      }
+    } catch {}
+  });
+</script>
+
 <style>
   /* sizes in cqw of .phone; the front's own details in cqw of the front face */
   .phone { container-type: inline-size; width: 100%; max-width: min(21rem, 60vw); }
   .set {
     position: relative;
     width: 30cqw;
-    height: 128cqw;
+    height: 104cqw;
     margin: 42cqw 0 6cqw 26cqw;
     transform-style: preserve-3d;
     transform: perspective(1600px) rotateX(-10deg) rotateY(-30deg);
@@ -54,7 +84,7 @@ const fns = ['MCL', 'CLA', 'SND', 'STO', 'RCL', 'END', 'FCN', 'LCL', 'VOL'];
     left: 10%;
     right: 10%;
     top: 3%;
-    height: 14%;
+    height: 16%;
     border-radius: 14cqw 14cqw 6cqw 6cqw;
     background: radial-gradient(#3e3d38 1.6cqw, #0000 2cqw) 50% / 9cqw 9cqw content-box, #8d8b82;
     padding: 18cqw 22cqw;
@@ -64,11 +94,12 @@ const fns = ['MCL', 'CLA', 'SND', 'STO', 'RCL', 'END', 'FCN', 'LCL', 'VOL'];
     position: absolute;
     left: 14%;
     right: 14%;
-    top: 20%;
-    height: 6%;
+    top: 23%;
+    height: 7%;
+    display: grid !important;
+    place-items: center;
     background: #120d0c;
-    font: 11cqw/6.6 var(--font-pixel);
-    text-align: center;
+    font: 11cqw/1 var(--font-pixel);
     color: #ff3b30;
     text-shadow: 0 0 2cqw #ff3b30;
   }
@@ -77,36 +108,36 @@ const fns = ['MCL', 'CLA', 'SND', 'STO', 'RCL', 'END', 'FCN', 'LCL', 'VOL'];
     position: absolute;
     left: 8%;
     right: 8%;
-    top: 30%;
-    bottom: 13%;
+    top: 35%;
+    bottom: 15%;
     display: grid !important;
-    grid: repeat(7, 1fr) / repeat(3, 1fr);
+    grid: repeat(4, 1fr) / repeat(3, 1fr);
     gap: 4cqw 6cqw;
     padding: 7cqw;
     border-radius: 4cqw;
     background: #8e8c83;
     box-shadow: inset 0 1cqw 2cqw rgb(0 0 0 / 0.35);
   }
-  .pad b {
+  .pad button {
     display: grid;
     place-items: center;
+    padding: 0;
+    border: 0;
     border-radius: 2cqw;
     background: linear-gradient(#efece4, #cfccc2);
     box-shadow: 0 1.2cqw 0 #5f5d56;
     font: 700 9cqw/1 var(--font-body);
     color: #2c2b28;
   }
-  .pad .fn { font: 5.5cqw/1 var(--font-pixel); }
-  /* a little air between the number keys and the function keys */
-  .pad .fn:nth-child(-n + 15) { margin-top: 5cqw; }
-  .pad .snd { background: linear-gradient(#ff6a5c, #e0392b); color: #fff; }
+  /* pressed: the key darkens and loses its edge; moving it would make the click miss */
+  .pad button:active { background: #bdb9ae; box-shadow: none; }
   /* mouthpiece: a sloped grey lip */
   .mic {
     position: absolute;
     left: 10%;
     right: 10%;
     bottom: 3%;
-    height: 8%;
+    height: 9%;
     border-radius: 4cqw 4cqw 10cqw 10cqw;
     background: linear-gradient(#77756d, #9a988f);
   }

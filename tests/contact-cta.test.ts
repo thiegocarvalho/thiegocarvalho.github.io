@@ -1,3 +1,4 @@
+import { gzipSync } from 'node:zlib';
 import { allHtml } from './helpers/dist';
 import { ui } from '../src/i18n/ui';
 
@@ -41,15 +42,25 @@ describe('contact CTA in the footer', () => {
 });
 
 describe("the contact phone", () => {
-  it("sits inside the contact CTA on every page, decorative and script-free", () => {
+  it("sits inside the contact CTA on every page, hidden from assistive tech", () => {
     for (const { path, html } of allHtml()) {
       const cta = html.match(/<section[^>]*id="contact"[\s\S]*?<\/section>/)![0];
       expect(cta, path).toMatch(/<div class="phone[^"]*" aria-hidden="true"/);
-      // the brick phone: a 3D box-kit body with a display and 21 keys on its front
+      // the brick phone: a 3D box-kit body with a display and the twelve number keys only
       expect(cta, path).toMatch(/class="box brick/);
       expect(cta, path).toMatch(/class="lcd/);
-      expect(cta.match(/<b[^>]*>(?:[0-9*#]|[A-Z]{3})<\/b>/g), path).toHaveLength(21);
-      expect(cta, path).not.toContain("<script");
+      const keys = [...cta.matchAll(/<button type="button" tabindex="-1"[^>]*>([^<]+)<\/button>/g)].map((m) => m[1]);
+      expect(keys, path).toEqual(['1', '2', '3', '4', '5', '6', '7', '8', '9', '*', '0', '#']);
+    }
+  });
+  it("dials with one tiny inline script per page: digits on the display, touch tones, idle text back", () => {
+    for (const { path, html } of allHtml()) {
+      const s = html.match(/<script type="module" data-phone>([\s\S]*?)<\/script>/)?.[1];
+      expect(s, path).toBeTruthy();
+      expect(gzipSync(s!).length, path).toBeLessThanOrEqual(1024);
+      expect(s, path).toMatch(/AudioContext/);
+      expect(s, path).toMatch(/697/);
+      expect(s, path).toMatch(/setTimeout/);
     }
   });
 });

@@ -1,13 +1,15 @@
 import { gzipSync } from "node:zlib";
 import { allHtml, allStyles, distFiles, readDist } from "./helpers/dist";
 
-// Script budget: the two home pages carry the floppy carousel; the project pages carry one tiny
-// inline eject script (<= 1 KB gzipped, asserted below). Nothing else ships JS.
+// Script budget: every page carries the footer phone's tiny inline dial script (data-phone,
+// <= 1 KB gz, see contact-cta.test.ts); the two home pages add the floppy carousel; the project
+// pages add one tiny inline eject script (<= 1 KB gzipped, asserted below). Nothing else ships JS.
 const HOME_PAGES = ["index.html", "pt/index.html"];
 
 const allScriptTags = (html: string) =>
   [...html.matchAll(/<script\b([^>]*)>([\s\S]*?)<\/script>/g)].map((m) => ({ attrs: m[1], body: m[2] }));
-const scriptTags = allScriptTags;
+// The footer phone's dial script is on every page and budgeted on its own; the tests below count the rest.
+const scriptTags = (html: string) => allScriptTags(html).filter((t) => !/\bdata-phone\b/.test(t.attrs));
 const isExecutable = (attrs: string) => !/type=["']?(application\/ld\+json|application\/json)/.test(attrs);
 
 describe("JavaScript budget", () => {
@@ -18,9 +20,10 @@ describe("JavaScript budget", () => {
     }
   });
 
-  it("ships zero JS on the profile pages (sticky timeline and scroll animation stay pure CSS)", () => {
+  it("ships no JS beyond the footer phone on the profile pages (sticky timeline and scroll animation stay pure CSS)", () => {
     for (const page of ["about/index.html", "pt/about/index.html"]) {
-      expect(allScriptTags(readDist(page)), page).toHaveLength(0);
+      expect(scriptTags(readDist(page)), page).toHaveLength(0);
+      expect(allScriptTags(readDist(page)), page).toHaveLength(1);
     }
   });
 
