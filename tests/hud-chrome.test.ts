@@ -88,7 +88,10 @@ describe('hero CRT', () => {
     expect(css).toMatch(/\.glass[^{]*:after\{[^}]*repeating-linear-gradient/);
     expect(css).toMatch(/prefers-reduced-motion:\s*no-preference\)\s*\{[^@]*animation-name:\s*power-on/);
     expect(css).toMatch(/animation-name:\s*crt-away/);
-    // the power-on animates a pseudo overlay, never the h1 itself
-    expect(css).not.toMatch(/h1\s*\{[^}]*power-on/);
+    // the title waits for the tube to light, but only under no-preference and never past ~1.3s
+    const on = css.match(/\.glass[^{\s]* h1[^{]*\{([^}]*animation-name:\s*title-on[^}]*)\}/)![1];
+    const sec = (k: string) => parseFloat(on.match(new RegExp(`animation-${k}:\\s*([\\d.]+)s`))![1]);
+    expect(sec('delay') + sec('duration')).toBeLessThanOrEqual(1.3);
+    expect(css).toMatch(/prefers-reduced-motion:\s*no-preference\)\s*\{[^@]*title-on/);
   });
 });

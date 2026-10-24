@@ -371,27 +371,63 @@ const focus = t('hero.headline').split(' · ');
     border: 1px solid var(--color-line-bright);
   }
 
-  /* One-time power-on: a decorative flash opens from a horizontal line over
-     the glass. The text underneath is painted from the first frame. */
+  /*
+   * Power-on, once, about 1.3s: the LED lights, a dot appears mid-tube,
+   * stretches to a line, the line opens into a full white flash that decays
+   * to the dark phosphor, and only then the title flickers in. Reduced motion
+   * (and browsers without animations) see the lit screen and title at once.
+   */
   @keyframes power-on {
-    0% { opacity: 1; clip-path: inset(49.5% 0 49.5% 0); }
-    55% { opacity: 0.85; clip-path: inset(0); }
+    0% { opacity: 1; clip-path: inset(49.4% 49.4%); }
+    14% { opacity: 1; clip-path: inset(49.4% 49.4%); }
+    34% { opacity: 1; clip-path: inset(49.4% 0); }
+    52% { opacity: 1; clip-path: inset(0); }
     100% { opacity: 0; clip-path: inset(0); }
   }
+  @keyframes title-on {
+    0% { opacity: 0; }
+    30% { opacity: 1; }
+    40% { opacity: 0.25; }
+    55% { opacity: 1; }
+    70% { opacity: 0.6; }
+    100% { opacity: 1; }
+  }
+  @keyframes led-on { from { background: #1d3a26; box-shadow: none; } }
+  /* the dead tube before the flash: flat dark glass, no phosphor glow */
+  @keyframes tube-off { from { background: #0d100f; } }
   @media (prefers-reduced-motion: no-preference) {
+    .glass {
+      animation-name: tube-off;
+      animation-duration: 0.55s;
+      animation-timing-function: steps(1, end);
+      animation-fill-mode: backwards;
+    }
     .glass::before {
       content: '';
       position: absolute;
       inset: 0;
       z-index: 2;
       pointer-events: none;
-      background: radial-gradient(ellipse at center, #eaffff 0%, rgb(25 227 255 / 0.7) 60%, rgb(25 227 255 / 0.3) 100%);
+      background: radial-gradient(ellipse at center, #fff 0%, #eaffff 35%, rgb(25 227 255 / 0.6) 100%);
       animation-name: power-on;
-      animation-duration: 0.42s;
+      animation-duration: 0.75s;
+      animation-delay: 0.2s;
       animation-timing-function: cubic-bezier(0.3, 0.6, 0.3, 1);
       animation-fill-mode: both;
     }
-    .pled { animation: blink 1.6s steps(2, jump-none) 3; }
+    .glass h1 {
+      animation-name: title-on;
+      animation-duration: 0.35s;
+      animation-delay: 0.95s;
+      animation-timing-function: steps(1, end);
+      animation-fill-mode: backwards;
+    }
+    .pled {
+      animation-name: led-on;
+      animation-duration: 0.15s;
+      animation-timing-function: steps(1, end);
+      animation-fill-mode: backwards;
+    }
   }
 
   /*
