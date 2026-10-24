@@ -129,7 +129,8 @@ const Inner = href ? 'a' : 'div';
     transform: translateZ(calc(var(--t) / -2)) rotateY(180deg);
     backface-visibility: visible;
     background: var(--edge);
-    clip-path: polygon(0 0, 95% 0, 100% 5%, 100% 100%, 0 100%);
+    /* mirrored: rotateY(180deg) flips it, so the cut must sit top-left here to land top-right on screen */
+    clip-path: polygon(0 5%, 5% 0, 100% 0, 100% 100%, 0 100%);
   }
   .edge { background: linear-gradient(var(--edge), color-mix(in srgb, var(--edge), black 35%)); backface-visibility: visible; }
   .e-r, .e-l { top: 5%; bottom: 0; width: var(--t); transform: rotateY(90deg); }
