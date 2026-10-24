@@ -35,17 +35,17 @@ describe('project pages', () => {
       expect(html).toContain(`hreflang="x-default" href="${SITE}/projects/${p.slug}/"`);
     });
 
-    it('carries the full localized summary, tech and links in the HTML, with no script', () => {
+    it('carries the full localized summary, tech and links in the HTML, with no script beyond the eject hook', () => {
       expect(html).toContain(esc(p.summary[lang]));
       for (const t of p.tech) expect(html).toContain(esc(t));
       if (p.url) expect(html).toContain(`href="${p.url}"`);
       if (p.repo) expect(html).toContain(`href="${p.repo}"`);
-      expect(html).not.toMatch(/<script\b/);
+      expect(html.match(/<script\b/g)).toHaveLength(1);
     });
 
     it('has a way back to the home projects, in the page and in the terminal, and the language switch', () => {
       const home = lang === 'pt' ? '/pt/' : '/';
-      expect(html.match(new RegExp(`href="${home}#projects"[^>]*>(?:&lt;|<)`, 'g'))!.length).toBeGreaterThanOrEqual(2);
+      expect(html.match(new RegExp(`href="${home}\\?disk=${p.slug}#projects"[^>]*>(?:&lt;|<)`, 'g'))!.length).toBeGreaterThanOrEqual(2);
       expect(html).toMatch(new RegExp(`data-lang-switch[\\s\\S]{0,120}href="${other}"`));
     });
 

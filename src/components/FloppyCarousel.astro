@@ -135,8 +135,12 @@ const start = Math.floor((total - 1) / 2);
       go(to);
     });
 
-    track.scrollLeft = target(start);
+    // Arriving from a project page's EJECT: open on that disk, then drop the query.
+    const want = slots.findIndex((s) => s.dataset.slug === new URLSearchParams(location.search).get('disk'));
+    track.scrollLeft = target(want < 0 ? start : want);
     update();
+    goal = current;
+    if (want >= 0) history.replaceState(null, '', location.pathname + location.hash);
   }
 </script>
 

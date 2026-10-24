@@ -28,7 +28,8 @@ const summary = p.summary[lang];
 const description =
   summary.length <= 160 ? summary : `${summary.slice(0, 157).replace(/\s+\S*$/, '')}…`;
 const home = localizePath('/', lang);
-const back = `${home}#projects`;
+// ?disk= tells the home carousel which disk to centre when it opens.
+const back = `${home}?disk=${slug}#projects`;
 const dos = `${slug.replace(/[^a-z0-9]/gi, '').slice(0, 8).toUpperCase()}.TXT`;
 ---
 
@@ -80,6 +81,26 @@ const dos = `${slug.replace(/[^a-z0-9]/gi, '').slice(0, 8).toUpperCase()}.TXT`;
   </main>
   <SiteFooter lang={lang} />
 </Base>
+
+<script>
+  // Eject: play the pop-out before leaving. Without this script (or under
+  // reduced motion) the link is a plain link and navigates at once. The
+  // pageswap hook puts the disk in its ejected pose for the transition snapshot
+  // on any exit, the browser Back button included.
+  const root = document.documentElement;
+  addEventListener('pageswap', () => root.classList.add('ejected'));
+  addEventListener('pageshow', (e) => e.persisted && root.classList.remove('ejected', 'ejecting'));
+  const still = matchMedia('(prefers-reduced-motion: reduce)');
+  document.querySelectorAll<HTMLAnchorElement>('a.eject, a.eject-top').forEach((a) =>
+    a.addEventListener('click', (e) => {
+      if (still.matches || e.defaultPrevented || e.button || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+      e.preventDefault();
+      if (root.classList.contains('ejecting')) return;
+      root.classList.add('ejecting');
+      setTimeout(() => location.assign(a.href), 620);
+    }),
+  );
+</script>
 
 <style>
   main {
@@ -225,7 +246,23 @@ const dos = `${slug.replace(/[^a-z0-9]/gi, '').slice(0, 8).toUpperCase()}.TXT`;
   @keyframes type-line { from { opacity: 1; clip-path: inset(0 100% 0 0); } to { opacity: 1; clip-path: inset(0); } }
   @keyframes blink { 50% { opacity: 0; } }
 
+  /* Eject: the reverse of the insert. Only ever set from the script. */
+  @keyframes eject-disk {
+    0% { transform: translateY(calc(var(--w) * -0.8)); }
+    72% { transform: translateY(calc(var(--w) * 0.46)); }
+    100% { transform: translateY(calc(var(--w) * 0.4)); }
+  }
+  @keyframes close-term { to { transform: scale(0.97, 0.02); opacity: 0; } }
+  @keyframes press { to { transform: translateY(2px); box-shadow: 0 0 0 #4e4a3c, inset 0 1px 0 rgb(0 0 0 / 0.3); } }
+  @keyframes led-off { to { opacity: 0.12; box-shadow: none; } }
+  :global(html.ejected) .insert { transform: translateY(calc(var(--w) * 0.4)); animation: none; }
+  :global(html.ejected) .term { opacity: 0; animation: none; }
+  :global(html.ejected) .led { opacity: 0.12; box-shadow: none; animation: none; }
   @media (prefers-reduced-motion: no-preference) {
+    :global(html.ejecting) .term { animation: close-term 0.22s ease-in both; }
+    :global(html.ejecting) .btn { animation: press 0.2s 0.1s ease-out both; }
+    :global(html.ejecting) .led { animation: led-off 0.1s 0.12s both; }
+    :global(html.ejecting) .insert { animation: eject-disk 0.42s 0.18s cubic-bezier(0.2, 0.7, 0.3, 1) both; }
     .insert {
       animation-name: insert-disk;
       animation-duration: 0.45s;

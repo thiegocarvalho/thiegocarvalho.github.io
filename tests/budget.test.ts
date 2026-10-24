@@ -2,7 +2,8 @@ import { gzipSync } from "node:zlib";
 import { allHtml, allStyles, distFiles, readDist } from "./helpers/dist";
 
 // The only pages allowed to carry script: the two home pages ship the floppy
-// carousel. Everything else stays at zero JS.
+// carousel, and the project pages carry one tiny inline eject script (<= 1 KB
+// gzipped, asserted below). Everything else stays at zero JS.
 const HOME_PAGES = ["index.html", "pt/index.html"];
 
 const scriptTags = (html: string) =>
@@ -10,9 +11,9 @@ const scriptTags = (html: string) =>
 const isExecutable = (attrs: string) => !/type=["']?(application\/ld\+json|application\/json)/.test(attrs);
 
 describe("JavaScript budget", () => {
-  it("ships no script on any page except the home pages", () => {
+  it("ships no script on any page except the home and project pages", () => {
     for (const { path, html } of allHtml()) {
-      if (HOME_PAGES.includes(path)) continue;
+      if (HOME_PAGES.includes(path) || /(^|\/)projects\/[^/]+\/index\.html$/.test(path)) continue;
       expect(html, path).not.toMatch(/<script\b/);
     }
   });
@@ -23,10 +24,17 @@ describe("JavaScript budget", () => {
     }
   });
 
-  it("ships zero JS on all 12 project pages (the drive and terminal sequence is pure CSS)", () => {
+  it("ships only one tiny inline eject script (<= 1 KB gzipped) on the 12 project pages", () => {
+    // The script only delays navigation for the eject animation; the link works without it.
     const pages = distFiles("**/projects/*/index.html");
     expect(pages).toHaveLength(12);
-    for (const page of pages) expect(readDist(page), page).not.toMatch(/<script\b/);
+    for (const page of pages) {
+      const tags = scriptTags(readDist(page));
+      expect(tags, page).toHaveLength(1);
+      expect(tags[0].attrs, page).toMatch(/type=["']module["']/);
+      expect(tags[0].attrs, page).not.toMatch(/src=/);
+      expect(gzipSync(tags[0].body).length, page).toBeLessThanOrEqual(1024);
+    }
   });
 
   it("emits JS bundles only for the home pages' carousel", () => {
