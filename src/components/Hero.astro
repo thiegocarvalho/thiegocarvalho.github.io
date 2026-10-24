@@ -123,7 +123,7 @@ const focus = t('hero.headline').split(' · ');
     padding-block: 24px;
   }
   @media (min-width: 56rem) {
-    .main { grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr); gap: 40px; }
+    .main { grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.2fr); gap: 24px; }
   }
   /* each word of the name on its own line: the text runs and the accent
      become separate grid rows without any extra markup */
@@ -137,6 +137,7 @@ const focus = t('hero.headline').split(' · ');
     text-transform: uppercase;
   }
   .name em { color: var(--color-hazard); font-style: italic; }
+  @media (min-width: 56rem) { .name { font-size: clamp(2.75rem, 6.4vw, 5.25rem); } }
 
   /* ---- the monitor: same beige hardware as the project page's drive ---- */
   /*
@@ -147,7 +148,7 @@ const focus = t('hero.headline').split(' · ');
    */
   .crt {
     width: 100%;
-    max-width: 34rem;
+    max-width: 44rem;
     justify-self: center;
     container-type: inline-size;
     padding-block: 14cqw 6cqw;
