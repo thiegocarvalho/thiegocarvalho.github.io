@@ -92,13 +92,12 @@ button:focus-visible,
     --sweep: 0px;
     --scan-on: 1;
     filter: drop-shadow(3px 0 0 rgb(255 43 214 / 0.7)) drop-shadow(-3px 0 0 rgb(25 227 255 / 0.7));
-    translate: 4px 0;
   }
-  6% { translate: -3px 0; opacity: 0.6; }
-  12% { translate: 2px 0; opacity: 1; }
-  18% { filter: none; translate: none; }
+  6% { filter: drop-shadow(-4px 0 0 rgb(255 43 214 / 0.7)) drop-shadow(4px 0 0 rgb(25 227 255 / 0.7)); opacity: 0.6; }
+  12% { opacity: 1; }
+  18% { filter: none; }
   85% { --sweep: 30vh; --scan-on: 1; }
-  100% { --scan-on: 0; --sweep: calc(100% + 100vmax); filter: none; translate: none; }
+  100% { --scan-on: 0; --sweep: calc(100% + 100vmax); filter: none; }
 }
 @supports (animation-timeline: view()) {
   @media (prefers-reduced-motion: no-preference) {
