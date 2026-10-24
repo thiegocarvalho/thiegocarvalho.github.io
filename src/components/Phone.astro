@@ -1,67 +1,84 @@
 ---
 /**
- * An old desk telephone beside the contact call to action, built from the
- * same 3D box kit as the hero's CRT (global.css): a base with a keypad on
- * top, a raised cradle at the back, the handset resting across it and a
- * coiled cord down the right flank. Decorative only.
+ * An old rotary desk telephone beside the contact call to action. The body is
+ * a truncated pyramid on a thin plinth: each visible wall is a trapezoid
+ * standing on its bottom edge, pushed out from the centre and tilted inward
+ * (front, right side, flat top). The rotary dial sits on the front slope; the
+ * handset and its two cradle forks come from the shared 3D box kit
+ * (global.css). Decorative only.
+ *
+ * Units are cqw of .phone. Body: 60 x 54 at the base, 34 x 22 on top (set 6
+ * back), 18 tall, so the front wall leans 50.7deg over 28.4, the sides
+ * 35.8deg over 22.2.
  */
-// the coiled cord: a tight wave along the line from the handset to the base
-const coil = Array.from({ length: 73 }, (_, i) => {
-  const k = i / 72;
-  const x = 92 - k * 80;
-  const y = 6 + k * 46 + Math.sin(i * 1.6) * 4;
-  return `${i ? 'L' : 'M'}${x.toFixed(1)} ${y.toFixed(1)}`;
-}).join('');
 ---
 
 <div class="phone" aria-hidden="true">
   <div class="set">
-    <span class="box base">
-      <i class="fr"></i><i class="tp"></i><i class="sd"></i><i class="keys"></i>
-      <svg class="cord" viewBox="0 0 100 60"><path d={coil} /></svg>
+    <i class="w plinth"></i><i class="w plinth s"></i><i class="w ledge"></i>
+    <span class="upper">
+      <i class="w front"><b class="dial"></b></i>
+      <i class="w side"></i>
+      <i class="w top"></i>
+      <span class="box fork"><i class="fr"></i><i class="tp"></i><i class="sd"></i></span>
+      <span class="box fork r"><i class="fr"></i><i class="tp"></i><i class="sd"></i></span>
+      <span class="box grip"><i class="fr"></i><i class="tp"></i><i class="sd"></i></span>
+      <span class="box cup"><i class="fr"></i><i class="tp"></i><i class="sd"></i></span>
+      <span class="box cup r"><i class="fr"></i><i class="tp"></i><i class="sd"></i></span>
     </span>
-    <span class="box cradle"><i class="fr"></i><i class="tp"></i><i class="sd"></i></span>
-    <span class="box bar"><i class="fr"></i><i class="tp"></i><i class="sd"></i></span>
-    <span class="box cup"><i class="fr"></i><i class="tp"></i><i class="sd"></i></span>
-    <span class="box cup r"><i class="fr"></i><i class="tp"></i><i class="sd"></i></span>
   </div>
 </div>
 
 <style>
-  /* depths in cqw of .phone, so the set scales with its column */
-  .phone { container-type: inline-size; width: 100%; max-width: min(28rem, 82vw); padding: 30cqw 0 10cqw; }
-  .set {
-    position: relative;
-    width: 66cqw;
-    height: 14cqw;
-    margin-left: 10cqw;
-    transform-style: preserve-3d;
-    transform: perspective(1800px) rotateX(-28deg) rotateY(-32deg);
+  .phone { position: relative; container-type: inline-size; width: 100%; max-width: min(28rem, 82vw); aspect-ratio: 5 / 4; }
+  /* a zero-size origin at the middle of the base; every wall is placed from it */
+  .set, .upper { position: absolute; transform-style: preserve-3d; }
+  .set { left: 50%; top: 74%; transform: perspective(1800px) rotateX(-22deg) rotateY(-34deg); }
+  .upper { transform: translateY(-3cqw); }
+  /* a wall: stands on its bottom edge at the origin, then is turned, pushed out and leaned */
+  .w { position: absolute; display: block; transform-origin: 50% 100%; }
+  .plinth { left: -31cqw; top: -3cqw; width: 62cqw; height: 3cqw; transform: translateZ(28cqw); background: #b5ad97; box-shadow: 0 14px 26px rgb(0 0 0 / 0.75); }
+  /* the plinth's top: the thin ledge left around the body's foot */
+  .ledge { left: -31cqw; top: -28cqw; width: 62cqw; height: 56cqw; transform-origin: 50% 50%; transform: translateY(-3cqw) rotateX(90deg); background: #d3cbb6; }
+  .plinth.s { left: -28cqw; width: 56cqw; transform: rotateY(90deg) translateZ(31cqw); background: #8d8772; box-shadow: none; }
+  .front {
+    left: -30cqw;
+    top: -28.4cqw;
+    width: 60cqw;
+    height: 28.4cqw;
+    transform: translateZ(27cqw) rotateX(50.7deg);
+    clip-path: polygon(21.7% 0, 78.3% 0, 100% 100%, 0 100%);
+    background: linear-gradient(#e2dac6, #c4bca7);
   }
-  .base { inset: 0; --d: 48cqw; }
-  .base > .fr { box-shadow: 0 18px 28px rgb(0 0 0 / 0.7); }
-  /* twelve square keys on the front of the top deck */
-  .keys {
-    left: 30%;
-    bottom: 100%;
-    width: 40%;
-    height: 20cqw;
-    transform-origin: 50% 100%;
-    transform: rotateX(90deg) translateY(-3cqw) translateZ(0.3cqw);
-    /* light keys separated by dark gaps: two stripe layers over the key colour */
+  .side {
+    left: -27cqw;
+    top: -22.2cqw;
+    width: 54cqw;
+    height: 22.2cqw;
+    transform: rotateY(90deg) translateZ(30cqw) rotateX(35.8deg);
+    clip-path: polygon(40.7% 0, 81.5% 0, 100% 100%, 0 100%);
+    background: linear-gradient(90deg, #a8a28b, #847e69);
+  }
+  .top { left: -17cqw; top: -11cqw; width: 34cqw; height: 22cqw; transform-origin: 50% 50%; transform: translateY(-18cqw) translateZ(-6cqw) rotateX(90deg); background: #e9e3cf; }
+  /* the rotary dial: a cream disc, a ring of finger holes, a clear centre and the finger stop */
+  .dial {
+    position: absolute;
+    left: 31%;
+    top: 22%;
+    width: 38%;
+    aspect-ratio: 1;
+    border-radius: 50%;
     background:
-      linear-gradient(90deg, #57523f 0 14%, transparent 14% 86%, #57523f 86%) 0 0 / 33.4% 25%,
-      linear-gradient(#57523f 0 14%, transparent 14% 86%, #57523f 86%) 0 0 / 33.4% 25%,
-      #f1ebd8;
-    outline: 0.8cqw solid #57523f;
+      radial-gradient(circle, #f4f1e6 0 30%, #b9b39f 31% 33%, transparent 34% 64%, #e9d9a6 65%),
+      repeating-conic-gradient(from 20deg, #6e6857 0 15deg, #e9d9a6 15deg 30deg);
+    box-shadow: 0 0 0 0.6cqw #c7b787;
   }
-  .cradle { left: 6%; top: -8cqw; width: 88%; height: 8cqw; --d: 18cqw; transform: translateZ(-27cqw); }
-  /* the handset: a grip across the cradle with an earpiece and mouthpiece at the ends */
-  .bar { left: 4%; top: -11.5cqw; width: 92%; height: 3.5cqw; --d: 7cqw; transform: translateZ(-32.5cqw); }
-  .cup { left: -2%; top: -15cqw; width: 20%; height: 8cqw; --d: 13cqw; transform: translateZ(-29.5cqw); }
-  /* the handset a shade darker than the base, so it reads as its own part */
-  .bar > i, .cup > i { filter: brightness(0.8); }
-  .cup.r { left: 82%; }
-  .cord { position: absolute; left: 100%; top: -8cqw; width: 40cqw; height: 24cqw; transform-origin: 0 50%; transform: rotateY(90deg) translateZ(0.4cqw); overflow: visible; }
-  .cord path { fill: none; stroke: #4e4a3c; stroke-width: 1.6; stroke-linejoin: round; }
+  .dial::after { content: ''; position: absolute; right: 8%; bottom: 14%; width: 26%; height: 5%; background: #8f8a7a; transform: rotate(40deg); }
+  /* the cradle forks the handset rests on, then the handset: a grip and two cups */
+  .fork { left: -15cqw; top: -23cqw; width: 7cqw; height: 5cqw; --d: 10cqw; transform: translateZ(-1cqw); }
+  .fork.r { left: 8cqw; }
+  .grip { left: -33cqw; top: -27cqw; width: 66cqw; height: 4cqw; --d: 8cqw; transform: translateZ(-2cqw); }
+  .cup { left: -38cqw; top: -29cqw; width: 13cqw; height: 12cqw; --d: 14cqw; transform: translateZ(1cqw); }
+  .cup.r { left: 25cqw; }
+  .cup > i { border-radius: 35%; }
 </style>
