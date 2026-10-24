@@ -8,6 +8,7 @@
  * the centre, in disks).
  */
 import { getCollection } from 'astro:content';
+import Floppy from './Floppy.astro';
 import { useTranslations } from '../i18n/utils';
 import type { Lang } from '../i18n/ui';
 
@@ -19,44 +20,28 @@ const t = useTranslations(lang);
 const projects = (await getCollection('projects')).sort((a, b) => a.data.order - b.data.order);
 const pad = (n: number) => String(n).padStart(2, '0');
 const total = projects.length;
+// Start centred in the stack so the fan is symmetric, not lopsided from the first disk.
+const start = Math.floor((total - 1) / 2);
 ---
 
 <div data-carousel data-of={t('projects.of')} role="region" aria-roledescription="carousel" aria-label={t('projects.region')}>
   <ol class="track" data-track tabindex="0" aria-label={t('projects.track')}>
     {projects.map(({ id, data: p }, i) => (
-      <li class="slot" data-slot style={`--o:${i};--a:${i};z-index:${10 - i};--n:${i % 6}`}>
-        <a
-          class="disk"
-          href={`#project-${id}`}
-          data-disk
-          aria-current={i === 0 ? 'true' : undefined}
-          aria-label={`${p.name}, ${p.tag} (${i + 1} ${t('projects.of')} ${total})`}
-        >
-          <span class="floppy" aria-hidden="true">
-            <span class="print">3.5″ HD</span>
-            <span class="shutter"><span class="window"></span></span>
-            <span class="label">
-              <span class="name">{p.name}</span>
-              <span class="tagline">{p.tag}</span>
-            </span>
-            <span class="notch"></span>
-          </span>
-        </a>
-      </li>
+      <Floppy lang={lang} slug={id} name={p.name} tag={p.tag} index={i} total={total} start={start} href={`#project-${id}`} />
     ))}
   </ol>
 
   <div class="controls" data-controls>
     <button type="button" data-prev aria-label={t('projects.prev')}>‹</button>
     <p class="status" data-status aria-live="polite">
-      {`${projects[0].data.name} — 1 ${t('projects.of')} ${total}`}
+      {`${projects[start].data.name} — ${start + 1} ${t('projects.of')} ${total}`}
     </p>
     <button type="button" data-next aria-label={t('projects.next')}>›</button>
   </div>
 
   <div class="details">
     {projects.map(({ id, data: p }, i) => (
-      <article class="detail" id={`project-${id}`} data-project-entry data-active={i === 0 ? '' : undefined}>
+      <article class="detail" id={`project-${id}`} data-project-entry data-active={i === start ? '' : undefined}>
         <p class="file">{`FILE ${pad(i + 1)}/${pad(total)}`}</p>
         <h3>{p.name}</h3>
         <p class="meta">
@@ -85,8 +70,9 @@ const total = projects.length;
     const names = details.map((d) => d.querySelector('h3')!.textContent ?? '');
     const reduce = matchMedia('(prefers-reduced-motion: reduce)');
     const ofWord = root.dataset.of ?? '/';
-    let current = 0;
-    let goal = 0;
+    const start = slots.findIndex((s) => s.querySelector('[aria-current]'));
+    let current = start;
+    let goal = start;
     let frame = 0;
     let settle = 0;
 
@@ -145,7 +131,7 @@ const total = projects.length;
       go(to);
     });
 
-    track.scrollLeft = target(0);
+    track.scrollLeft = target(start);
     update();
   }
 </script>
@@ -155,6 +141,28 @@ const total = projects.length;
     --w: clamp(14rem, 58vw, 20rem);
     max-width: 72rem;
     margin: 0 auto;
+  }
+
+  /*
+   * Stack to fan, driven by scroll position (no script). --fan is 0 while the
+   * row of disks is still entering the screen and reaches 1 as it nears mid-screen; the
+   * scroll itself is untouched. Unsupported browsers, and reduced motion, never
+   * run this and keep the registered initial value of 1: the finished fan.
+   */
+  @keyframes fan-out {
+    from { --fan: 0; }
+    to { --fan: 1; }
+  }
+  @supports (animation-timeline: view()) {
+    @media (prefers-reduced-motion: no-preference) and (scripting: enabled) {
+      .track {
+        animation-name: fan-out;
+        animation-timing-function: linear;
+        animation-fill-mode: both;
+        animation-timeline: view();
+        animation-range: entry 20% cover 40%;
+      }
+    }
   }
 
   .track {
@@ -170,126 +178,6 @@ const total = projects.length;
     scrollbar-width: none;
   }
   .track::-webkit-scrollbar { display: none; }
-  .slot {
-    flex: none;
-    width: var(--w);
-    margin-inline: calc(var(--w) * -0.14);
-    scroll-snap-align: center;
-  }
-
-  .disk {
-    display: block;
-    border-radius: 4px;
-    filter: drop-shadow(0 0 0.5px rgb(255 255 255 / 0.5)) drop-shadow(0 18px 18px rgb(0 0 0 / 0.65));
-  }
-  @media (scripting: enabled) {
-    .disk {
-      transform-origin: 50% 70%;
-      transform: perspective(1000px) rotateY(calc(var(--o) * -32deg)) scale(calc(1 - var(--a) * 0.12));
-      filter: brightness(calc(1 - var(--a) * 0.3)) drop-shadow(0 0 0.5px rgb(255 255 255 / 0.5))
-        drop-shadow(0 18px 18px rgb(0 0 0 / 0.65));
-      will-change: transform;
-    }
-  }
-
-  /* The floppy. Everything is sized in cqw so it scales with the disk. */
-  .floppy {
-    --disk: #2f4a6b;
-    --band: var(--color-accent-cyan);
-    position: relative;
-    display: block;
-    aspect-ratio: 1;
-    container-type: inline-size;
-    background: linear-gradient(150deg, color-mix(in srgb, var(--disk), white 14%), var(--disk) 55%);
-    clip-path: polygon(0 0, 88% 0, 100% 12%, 100% 100%, 0 100%);
-  }
-  .slot:nth-child(6n + 2) .floppy { --disk: #6b2f5e; --band: var(--color-accent-magenta); }
-  .slot:nth-child(6n + 3) .floppy { --disk: #3f4350; --band: var(--color-hazard); }
-  .slot:nth-child(6n + 4) .floppy { --disk: #1f6b73; --band: var(--color-accent-magenta); }
-  .slot:nth-child(6n + 5) .floppy { --disk: #7a6a1c; --band: var(--color-accent-cyan); }
-  .slot:nth-child(6n) .floppy { --disk: #3a6b3a; --band: var(--color-hazard); }
-
-  .print {
-    position: absolute;
-    left: 5cqw;
-    top: 5cqw;
-    font-family: var(--font-pixel);
-    font-size: 4.5cqw;
-    letter-spacing: 0.06em;
-    color: rgb(255 255 255 / 0.7);
-  }
-  .shutter {
-    position: absolute;
-    left: 24cqw;
-    top: 0;
-    width: 54cqw;
-    height: 31cqw;
-    background: linear-gradient(90deg, #8d929d, #e6e9ee 28%, #b4b9c3 62%, #8a8f9a);
-    border-radius: 0 0 1.5cqw 1.5cqw;
-    box-shadow: inset 0 -1cqw 0 rgb(0 0 0 / 0.18);
-  }
-  .window {
-    position: absolute;
-    right: 6cqw;
-    top: 4cqw;
-    width: 11cqw;
-    height: 21cqw;
-    background: #101217;
-    border-radius: 1cqw;
-    box-shadow: inset 0.8cqw 0.8cqw 0 rgb(0 0 0 / 0.6);
-  }
-  .label {
-    position: absolute;
-    left: 10cqw;
-    right: 10cqw;
-    top: 40cqw;
-    bottom: 8cqw;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    padding: 9cqw 5cqw 4cqw;
-    overflow: hidden;
-    background:
-      linear-gradient(var(--band) 0 0) top / 100% 5cqw no-repeat,
-      repeating-linear-gradient(transparent 0 7.2cqw, rgb(40 70 120 / 0.28) 7.2cqw 7.6cqw),
-      #f5efd9;
-    border-radius: 0.8cqw;
-    box-shadow: 0 0.6cqw 1.2cqw rgb(0 0 0 / 0.35);
-  }
-  .name {
-    display: block;
-    font-family: var(--font-body);
-    font-size: 12cqw;
-    font-weight: 700;
-    font-style: italic;
-    line-height: 1.04;
-    letter-spacing: -0.02em;
-    color: #1b2a78;
-    text-wrap: balance;
-    transform: rotate(-2.5deg);
-    transform-origin: 0 100%;
-  }
-  .tagline {
-    align-self: flex-start;
-    font-family: var(--font-pixel);
-    font-size: 5.2cqw;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-    color: #c4143f;
-    text-decoration: underline wavy;
-    text-decoration-thickness: 0.5cqw;
-    text-underline-offset: 1cqw;
-  }
-  .notch {
-    position: absolute;
-    right: 4cqw;
-    bottom: 3cqw;
-    width: 5cqw;
-    height: 5cqw;
-    background: #08090c;
-    box-shadow: inset 0 -2cqw 0 rgb(255 255 255 / 0.55);
-  }
-
   .controls {
     display: flex;
     align-items: center;
@@ -344,7 +232,6 @@ const total = projects.length;
     .details { display: block; text-align: left; }
     .detail { visibility: visible; opacity: 1; margin-bottom: 36px; padding-top: 16px; border-top: 1px solid var(--color-line); }
     .track { padding-inline: 16px; scroll-snap-type: x proximity; }
-    .slot { margin-inline: 8px; }
   }
   .file {
     margin: 0 0 6px;

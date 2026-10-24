@@ -1,5 +1,6 @@
 import matter from 'gray-matter';
 import { globSync, readFileSync } from 'node:fs';
+import { basename } from 'node:path';
 import { readDist } from './helpers/dist';
 import { projectSchema } from '../src/content/schemas';
 
@@ -37,6 +38,27 @@ describe.each([
       const target = d.match(/href="#([^"]+)"/)![1];
       expect(html).toContain(`id="${target}"`);
     }
+  });
+
+  it('gives every disk a stable slug and a disk-<slug> view-transition-name, ready for project pages', () => {
+    const slugs = globSync('src/content/projects/*.md').map((f) => basename(f, '.md')).sort();
+    expect(slugs).toHaveLength(6);
+    const slots = [...html.matchAll(/<li[^>]*\bdata-slot\b[^>]*>/g)].map((m) => m[0]);
+    expect(slots.map((s) => s.match(/data-slug="([^"]+)"/)![1]).sort()).toEqual(slugs);
+    for (const slug of slugs) {
+      expect(html, slug).toMatch(new RegExp(`<a[^>]*\\bdata-disk\\b[^>]*style="[^"]*view-transition-name:\\s*disk-${slug}(?:;|")`));
+    }
+    // Names must be unique per page, or the transition API ignores the duplicates.
+    const names = [...html.matchAll(/view-transition-name:\s*(disk-[a-z0-9-]+)/g)].map((m) => m[1]);
+    expect(new Set(names).size).toBe(names.length);
+  });
+
+  it('starts centred in the stack so the fan is symmetric', () => {
+    const slots = [...html.matchAll(/<li[^>]*\bdata-slot\b[^>]*>/g)].map((m) => m[0]);
+    const offsets = slots.map((s) => Number(s.match(/--o:(-?\d+)/)![1]));
+    expect(offsets).toEqual([-2, -1, 0, 1, 2, 3]);
+    const current = [...html.matchAll(/<a[^>]*\bdata-disk\b[^>]*>/g)].map((m) => m[0]).findIndex((d) => /aria-current="true"/.test(d));
+    expect(current).toBe(2);
   });
 
   it('is an accessible labelled region with a focusable, labelled track and a live status', () => {

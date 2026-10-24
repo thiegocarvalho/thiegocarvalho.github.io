@@ -1,0 +1,191 @@
+---
+/**
+ * One 3.5" floppy disk for one project. Reusable: the carousel renders one per
+ * project, and the per-project pages will link to and morph from the same
+ * element. The disk carries a stable `view-transition-name` of `disk-<slug>`,
+ * where the slug is the project's content id (its filename), so a
+ * cross-document view transition can pair it with the drive on the other page.
+ */
+import { useTranslations } from '../i18n/utils';
+import type { Lang } from '../i18n/ui';
+
+interface Props {
+  lang: Lang;
+  /** Stable URL-safe slug, the project's content entry id. */
+  slug: string;
+  name: string;
+  tag: string;
+  index: number;
+  total: number;
+  /** Index of the disk the fan starts centred on. */
+  start: number;
+  href: string;
+}
+const { lang, slug, name, tag, index, total, start, href } = Astro.props;
+const t = useTranslations(lang);
+const o = index - start;
+---
+
+<li
+  class="slot"
+  data-slot
+  data-slug={slug}
+  data-variant={index % 6}
+  style={`--o:${o};--a:${Math.abs(o)};z-index:${10 - Math.abs(o)}`}
+>
+  <a
+    class="disk"
+    href={href}
+    data-disk
+    style={`view-transition-name:disk-${slug}`}
+    aria-current={index === start ? 'true' : undefined}
+    aria-label={`${name}, ${tag} (${index + 1} ${t('projects.of')} ${total})`}
+  >
+    <span class="floppy" aria-hidden="true">
+      <span class="print">3.5″ HD</span>
+      <span class="shutter"><span class="window"></span></span>
+      <span class="label">
+        <span class="name">{name}</span>
+        <span class="tagline">{tag}</span>
+      </span>
+      <span class="notch"></span>
+    </span>
+  </a>
+</li>
+
+<style>
+  .slot {
+    flex: none;
+    width: var(--w);
+    margin-inline: calc(var(--w) * -0.14);
+    scroll-snap-align: center;
+  }
+  @media (scripting: none) {
+    .slot { margin-inline: 8px; }
+  }
+
+  .disk {
+    display: block;
+    border-radius: 4px;
+    filter: drop-shadow(0 0 0.5px rgb(255 255 255 / 0.5)) drop-shadow(0 18px 18px rgb(0 0 0 / 0.65));
+  }
+  /*
+   * The fan. --o is the signed distance from the centre in disks (set by the
+   * script as the row scrolls) and --fan runs 0 (a stack) to 1 (fanned); the
+   * carousel animates --fan on scroll where that is supported and otherwise it
+   * stays at 1, the finished fan.
+   */
+  @media (scripting: enabled) {
+    .disk {
+      --f: var(--fan, 1);
+      --k: calc(1 - var(--f));
+      transform-origin: 50% 70%;
+      transform: perspective(1000px)
+        translate(calc(var(--k) * var(--o) * var(--w) * -0.72), calc(var(--k) * var(--a) * -14px))
+        rotate(calc(var(--k) * var(--o) * 4deg))
+        rotateY(calc(var(--o) * var(--f) * -32deg))
+        scale(calc(1 - var(--a) * var(--f) * 0.12));
+      filter: brightness(calc(1 - var(--a) * var(--f) * 0.3 - var(--a) * var(--k) * 0.12))
+        drop-shadow(0 0 0.5px rgb(255 255 255 / 0.5)) drop-shadow(0 18px 18px rgb(0 0 0 / 0.65));
+      will-change: transform;
+    }
+  }
+
+  /* The floppy. Everything is sized in cqw so it scales with the disk. */
+  .floppy {
+    --disk: #2f4a6b;
+    --band: var(--color-accent-cyan);
+    position: relative;
+    display: block;
+    aspect-ratio: 1;
+    container-type: inline-size;
+    background: linear-gradient(150deg, color-mix(in srgb, var(--disk), white 14%), var(--disk) 55%);
+    clip-path: polygon(0 0, 88% 0, 100% 12%, 100% 100%, 0 100%);
+  }
+  [data-variant='1'] .floppy { --disk: #6b2f5e; --band: var(--color-accent-magenta); }
+  [data-variant='2'] .floppy { --disk: #3f4350; --band: var(--color-hazard); }
+  [data-variant='3'] .floppy { --disk: #1f6b73; --band: var(--color-accent-magenta); }
+  [data-variant='4'] .floppy { --disk: #7a6a1c; --band: var(--color-accent-cyan); }
+  [data-variant='5'] .floppy { --disk: #3a6b3a; --band: var(--color-hazard); }
+
+  .print {
+    position: absolute;
+    left: 5cqw;
+    top: 5cqw;
+    font-family: var(--font-pixel);
+    font-size: 4.5cqw;
+    letter-spacing: 0.06em;
+    color: rgb(255 255 255 / 0.7);
+  }
+  .shutter {
+    position: absolute;
+    left: 24cqw;
+    top: 0;
+    width: 54cqw;
+    height: 31cqw;
+    background: linear-gradient(90deg, #8d929d, #e6e9ee 28%, #b4b9c3 62%, #8a8f9a);
+    border-radius: 0 0 1.5cqw 1.5cqw;
+    box-shadow: inset 0 -1cqw 0 rgb(0 0 0 / 0.18);
+  }
+  .window {
+    position: absolute;
+    right: 6cqw;
+    top: 4cqw;
+    width: 11cqw;
+    height: 21cqw;
+    background: #101217;
+    border-radius: 1cqw;
+    box-shadow: inset 0.8cqw 0.8cqw 0 rgb(0 0 0 / 0.6);
+  }
+  .label {
+    position: absolute;
+    left: 10cqw;
+    right: 10cqw;
+    top: 40cqw;
+    bottom: 8cqw;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: 9cqw 5cqw 4cqw;
+    overflow: hidden;
+    background:
+      linear-gradient(var(--band) 0 0) top / 100% 5cqw no-repeat,
+      repeating-linear-gradient(transparent 0 7.2cqw, rgb(40 70 120 / 0.28) 7.2cqw 7.6cqw),
+      #f5efd9;
+    border-radius: 0.8cqw;
+    box-shadow: 0 0.6cqw 1.2cqw rgb(0 0 0 / 0.35);
+  }
+  .name {
+    display: block;
+    font-family: var(--font-body);
+    font-size: 12cqw;
+    font-weight: 700;
+    font-style: italic;
+    line-height: 1.04;
+    letter-spacing: -0.02em;
+    color: #1b2a78;
+    text-wrap: balance;
+    transform: rotate(-2.5deg);
+    transform-origin: 0 100%;
+  }
+  .tagline {
+    align-self: flex-start;
+    font-family: var(--font-pixel);
+    font-size: 5.2cqw;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: #c4143f;
+    text-decoration: underline wavy;
+    text-decoration-thickness: 0.5cqw;
+    text-underline-offset: 1cqw;
+  }
+  .notch {
+    position: absolute;
+    right: 4cqw;
+    bottom: 3cqw;
+    width: 5cqw;
+    height: 5cqw;
+    background: #08090c;
+    box-shadow: inset 0 -2cqw 0 rgb(255 255 255 / 0.55);
+  }
+</style>

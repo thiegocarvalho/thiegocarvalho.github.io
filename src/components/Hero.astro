@@ -56,6 +56,13 @@ const focus = t('hero.headline').split(' · ');
     margin: 0 auto;
     padding: 24px 16px 20px;
   }
+  /* Phone: no forced screen height. The block hugs its content instead of
+     stretching it apart, which was leaving dead space above the name. */
+  @media (max-width: 47.99rem) {
+    [data-hero] { min-height: 0; align-content: start; gap: 10px 16px; padding-top: 12px; }
+    .main { padding-block: 8px 12px; }
+    .headline { margin-top: 18px; }
+  }
   .hud {
     margin: 0;
     font-family: var(--font-pixel);
@@ -147,5 +154,37 @@ const focus = t('hero.headline').split(' · ');
     line-height: 1.3;
     color: var(--color-ink);
     border: 1px solid var(--color-line-bright);
+  }
+
+  /*
+   * Scrolling out of the hero: the giant type slides off to the left and
+   * shrinks while the HUD labels fade. Tied to scroll position only, so the
+   * scroll itself is untouched; unsupported browsers and reduced motion just
+   * see the hero as it is.
+   */
+  @keyframes hero-away {
+    to { transform: translate3d(-14%, -6vh, 0) scale(0.7); opacity: 0; }
+  }
+  @keyframes hud-away {
+    to { opacity: 0; }
+  }
+  @supports (animation-timeline: view()) {
+    @media (prefers-reduced-motion: no-preference) {
+      .main {
+        transform-origin: 0 50%;
+        animation-name: hero-away;
+        animation-timing-function: linear;
+        animation-fill-mode: both;
+        animation-timeline: view();
+        animation-range: exit 0% exit 85%;
+      }
+      .hud, .barcode, .side {
+        animation-name: hud-away;
+        animation-timing-function: linear;
+        animation-fill-mode: both;
+        animation-timeline: view();
+        animation-range: exit 0% exit 60%;
+      }
+    }
   }
 </style>
