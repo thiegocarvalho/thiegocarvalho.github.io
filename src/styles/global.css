@@ -96,7 +96,12 @@ button:focus-visible,
   6% { filter: drop-shadow(-4px 0 0 rgb(255 43 214 / 0.7)) drop-shadow(4px 0 0 rgb(25 227 255 / 0.7)); opacity: 0.6; }
   12% { opacity: 1; }
   18% { filter: none; }
-  85% { --sweep: 30vh; --scan-on: 1; }
+  /*
+   * Linear and ending at the range end, the sweep tracks how far the section
+   * has entered, so the line stays at the viewport's bottom edge and anything
+   * on screen is revealed even on a page that can't scroll any further.
+   */
+  99.9% { --sweep: 35vh; --scan-on: 1; }
   100% { --scan-on: 0; --sweep: calc(100% + 100vmax); filter: none; }
 }
 @supports (animation-timeline: view()) {
@@ -106,7 +111,7 @@ button:focus-visible,
       position: relative;
       clip-path: inset(-100vmax -100vmax calc(100% - var(--sweep)) -100vmax);
       animation-name: scan-in;
-      animation-timing-function: ease-in;
+      animation-timing-function: linear;
       animation-fill-mode: backwards;
       animation-timeline: view();
       animation-range-start: entry 0%;
