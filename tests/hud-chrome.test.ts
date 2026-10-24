@@ -72,3 +72,23 @@ describe('hero glitch', () => {
     expect(css).toMatch(/animation-iteration-count:\s*infinite/);
   });
 });
+
+describe('hero CRT', () => {
+  it('keeps the title as the h1 inside the monitor, with the name beside it, in both locales', () => {
+    for (const [p, title] of [['index.html', 'Software Architect &amp; Engineer'], ['pt/index.html', 'Arquiteto &amp; Engenheiro de Software']] as const) {
+      const html = readDist(p);
+      const crt = html.match(/<div class="crt[^"]*"[\s\S]*?<\/h1>/)![0];
+      expect(crt, p).toMatch(/class="glass/);
+      expect(crt.match(/<h1[^>]*>([\s\S]*?)<\/h1>/)![1].replace(/<[^>]+>/g, ''), p).toBe(title);
+      expect(html.indexOf('class="name'), p).toBeLessThan(html.indexOf('<h1'));
+    }
+  });
+  it('draws the monitor in CSS with scanlines, a decorative power-on only under no-preference, and its own scroll exit', () => {
+    const css = allStyles();
+    expect(css).toMatch(/\.glass[^{]*:after\{[^}]*repeating-linear-gradient/);
+    expect(css).toMatch(/prefers-reduced-motion:\s*no-preference\)\s*\{[^@]*animation-name:\s*power-on/);
+    expect(css).toMatch(/animation-name:\s*crt-away/);
+    // the power-on animates a pseudo overlay, never the h1 itself
+    expect(css).not.toMatch(/h1\s*\{[^}]*power-on/);
+  });
+});

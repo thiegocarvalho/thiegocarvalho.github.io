@@ -28,11 +28,27 @@ const focus = t('hero.headline').split(' · ');
   <p class="side" aria-hidden="true">{t('hud.side')}</p>
 
   <div class="main">
-    <p class="name">Thiego <em>"Zeru"</em> Carvalho</p>
-    <h1 id="hero-title">{before}<em data-text={word}>{word}</em>{after}</h1>
-    <p class="headline">
-      {focus.map((f) => <span>{f}</span>)}
-    </p>
+    <div class="id">
+      <p class="name">Thiego <em>"Zeru"</em> Carvalho</p>
+      <p class="headline">
+        {focus.map((f) => <span>{f}</span>)}
+      </p>
+    </div>
+    <div class="crt">
+      <div class="case">
+        <div class="glass">
+          <h1 id="hero-title">{before}<em data-text={word}>{word}</em>{after}</h1>
+        </div>
+        <div class="panel" aria-hidden="true">
+          <span class="strip"></span>
+          <span class="knob"></span>
+          <span class="knob"></span>
+          <span class="pled"></span>
+        </div>
+      </div>
+      <div class="neck" aria-hidden="true"></div>
+      <div class="foot" aria-hidden="true"></div>
+    </div>
   </div>
 </section>
 
@@ -56,8 +72,7 @@ const focus = t('hero.headline').split(' · ');
      stretching it apart, which was leaving dead space above the name. */
   @media (max-width: 47.99rem) {
     [data-hero] { min-height: 0; align-content: start; gap: 10px 16px; padding-top: 12px; }
-    .main { padding-block: 8px 12px; }
-    .headline { margin-top: 18px; }
+    .main { padding-block: 8px 12px; gap: 22px; }
   }
   .hud {
     margin: 0;
@@ -92,26 +107,146 @@ const focus = t('hero.headline').split(' · ');
     white-space: nowrap;
   }
   @media (min-width: 80rem) { .side { display: block; } }
-  .main { grid-area: main; align-self: center; padding-block: 24px; }
+  /* Two columns from tablet up: the name (the big type now) on the left, the
+     CRT carrying the title on the right. Stacked on phones: name, then monitor. */
+  .main {
+    grid-area: main;
+    align-self: center;
+    display: grid;
+    gap: 28px;
+    align-items: center;
+    padding-block: 24px;
+  }
+  @media (min-width: 56rem) {
+    .main { grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr); gap: 40px; }
+  }
+  /* each word of the name on its own line: the text runs and the accent
+     become separate grid rows without any extra markup */
   .name {
-    margin: 0 0 12px;
+    display: grid;
+    margin: 0;
     font-weight: 700;
-    font-size: clamp(1.125rem, 3.4vw, 2rem);
-    letter-spacing: -0.01em;
+    font-size: clamp(2.75rem, 13vw, 7rem);
+    line-height: 0.9;
+    letter-spacing: -0.045em;
     text-transform: uppercase;
   }
-  .name em { color: var(--color-hazard); }
+  .name em { color: var(--color-hazard); font-style: italic; }
+
+  /* ---- the monitor: same beige hardware as the project page's drive ---- */
+  .crt { width: 100%; max-width: 34rem; justify-self: center; display: grid; justify-items: center; }
+  .case {
+    position: relative;
+    box-sizing: border-box;
+    width: 100%;
+    padding: 6.5% 6.5% 4%;
+    border-radius: 12px 12px 16px 16px;
+    background:
+      linear-gradient(180deg, rgb(255 255 255 / 0.35), transparent 10%),
+      linear-gradient(180deg, #d4cdb8, #b3ac96);
+    box-shadow: inset 0 -3px 0 rgb(0 0 0 / 0.25), 0 18px 34px rgb(0 0 0 / 0.65), 0 0 0 1px #6f6a5a;
+  }
+  /* the tapering back of the tube, seen from above */
+  .case::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: -22px;
+    height: 22px;
+    background: linear-gradient(180deg, #ece6d2, #d9d2bc);
+    clip-path: polygon(8% 0, 92% 0, 100% 100%, 0 100%);
+  }
+  .glass {
+    position: relative;
+    aspect-ratio: 4 / 3;
+    container-type: inline-size;
+    display: grid;
+    align-content: center;
+    overflow: hidden;
+    padding: 6%;
+    border-radius: 7% / 9%;
+    background:
+      radial-gradient(ellipse at 50% 45%, rgb(25 227 255 / 0.16), transparent 70%),
+      #03080a;
+    box-shadow:
+      inset 0 0 0 2px #000,
+      inset 0 0 38px 12px rgb(0 0 0 / 0.85),
+      0 0 0 4px #8f8975,
+      0 0 0 5px rgb(0 0 0 / 0.35),
+      0 3px 0 5px rgb(255 255 255 / 0.3);
+  }
+  /* scanlines, curved-glass vignette and a soft glare, all over the text */
+  .glass::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    border-radius: inherit;
+    background:
+      radial-gradient(ellipse 60% 40% at 24% 14%, rgb(255 255 255 / 0.1), transparent 70%),
+      radial-gradient(ellipse at 50% 50%, transparent 55%, rgb(0 0 0 / 0.55) 100%),
+      repeating-linear-gradient(180deg, rgb(0 0 0 / 0.28) 0 1px, transparent 1px 3px);
+  }
+  .panel {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    height: 24px;
+    margin-top: 12px;
+  }
+  .strip {
+    flex: 1;
+    height: 10px;
+    border-radius: 2px;
+    background: repeating-linear-gradient(90deg, #8c8670 0 2px, #a39d86 2px 5px);
+    box-shadow: inset 0 1px 2px rgb(0 0 0 / 0.5), 0 1px 0 rgb(255 255 255 / 0.45);
+  }
+  .knob {
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    background: radial-gradient(circle at 35% 30%, #d9d2bc, #8f8975);
+    box-shadow: 0 1px 0 #4e4a3c, inset 0 0 0 1px rgb(0 0 0 / 0.2);
+  }
+  .pled {
+    width: 12px;
+    height: 6px;
+    border-radius: 1px;
+    background: #39ff7a;
+    box-shadow: 0 0 8px 1px #39ff7a, inset 0 0 0 1px rgb(0 0 0 / 0.25);
+  }
+  .neck {
+    width: 26%;
+    height: 14px;
+    background: linear-gradient(180deg, #8f8975, #b3ac96);
+    clip-path: polygon(8% 0, 92% 0, 100% 100%, 0 100%);
+  }
+  .foot {
+    width: 54%;
+    height: 12px;
+    border-radius: 3px 3px 8px 8px;
+    background: linear-gradient(180deg, #d4cdb8, #a39d86);
+    box-shadow: 0 10px 20px rgb(0 0 0 / 0.6), 0 0 0 1px #6f6a5a;
+  }
+
+  /* The title on the glass. Sized from the screen's own width so it always
+     fits the 4:3 tube; it is still the page's h1, real text, painted at once. */
   h1 {
+    position: relative;
     margin: 0;
     font-family: var(--font-body);
     font-weight: 700;
-    font-size: clamp(2.9rem, 14vw, 10.5rem);
-    line-height: 0.88;
+    font-size: 16.5cqi;
+    line-height: 0.9;
     letter-spacing: -0.045em;
     text-transform: uppercase;
     text-wrap: balance;
     overflow-wrap: normal;
+    text-shadow: 0 0 0.12em rgb(25 227 255 / 0.35);
   }
+  h1:lang(pt) { font-size: 11.5cqi; }
   h1 em {
     position: relative;
     display: inline-block;
@@ -184,8 +319,8 @@ const focus = t('hero.headline').split(' · ');
     display: flex;
     flex-wrap: wrap;
     gap: 6px 8px;
-    max-width: 52rem;
-    margin: 28px 0 0;
+    max-width: 40rem;
+    margin: 22px 0 0;
     padding: 0;
   }
   .headline span {
@@ -196,23 +331,56 @@ const focus = t('hero.headline').split(' · ');
     border: 1px solid var(--color-line-bright);
   }
 
+  /* One-time power-on: a decorative flash opens from a horizontal line over
+     the glass. The text underneath is painted from the first frame. */
+  @keyframes power-on {
+    0% { opacity: 1; clip-path: inset(49.5% 0 49.5% 0); }
+    55% { opacity: 0.85; clip-path: inset(0); }
+    100% { opacity: 0; clip-path: inset(0); }
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    .glass::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      z-index: 2;
+      pointer-events: none;
+      background: radial-gradient(ellipse at center, #eaffff 0%, rgb(25 227 255 / 0.7) 60%, rgb(25 227 255 / 0.3) 100%);
+      animation-name: power-on;
+      animation-duration: 0.42s;
+      animation-timing-function: cubic-bezier(0.3, 0.6, 0.3, 1);
+      animation-fill-mode: both;
+    }
+    .pled { animation: blink 1.6s steps(2, jump-none) 3; }
+  }
+
   /*
-   * Scrolling out of the hero: the giant type slides off to the left and
-   * shrinks while the HUD labels fade. Tied to scroll position only, so the
-   * scroll itself is untouched; unsupported browsers and reduced motion just
-   * see the hero as it is.
+   * Scrolling out of the hero: the name slides off to the left and shrinks,
+   * the monitor drifts right and dims, and the HUD labels fade. Tied to scroll
+   * position only; unsupported browsers and reduced motion see the hero as is.
    */
   @keyframes hero-away {
     to { transform: translate3d(-14%, -6vh, 0) scale(0.7); opacity: 0; }
+  }
+  @keyframes crt-away {
+    to { transform: translate3d(10%, -4vh, 0) scale(0.82); opacity: 0; filter: brightness(0.5); }
   }
   @keyframes hud-away {
     to { opacity: 0; }
   }
   @supports (animation-timeline: view()) {
     @media (prefers-reduced-motion: no-preference) {
-      .main {
+      .id {
         transform-origin: 0 50%;
         animation-name: hero-away;
+        animation-timing-function: linear;
+        animation-fill-mode: both;
+        animation-timeline: view();
+        animation-range: exit 0% exit 85%;
+      }
+      .crt {
+        transform-origin: 100% 50%;
+        animation-name: crt-away;
         animation-timing-function: linear;
         animation-fill-mode: both;
         animation-timeline: view();
