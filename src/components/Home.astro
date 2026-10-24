@@ -1,16 +1,20 @@
 ---
 /** The whole home page, shared by both locale routes so they cannot drift. */
+import { getCollection } from 'astro:content';
 import Base from '../layouts/Base.astro';
-import Window from './Window.astro';
-import DeskPoster from './DeskPoster.astro';
+import Panel from './Panel.astro';
+import Hero from './Hero.astro';
+import Marquee from './Marquee.astro';
 import TextNav from './TextNav.astro';
 import ExperienceList from './ExperienceList.astro';
-import ProjectList from './ProjectList.astro';
+import FloppyCarousel from './FloppyCarousel.astro';
 import AboutPanel from './AboutPanel.astro';
 import SocialLinks from './SocialLinks.astro';
 import SiteFooter from './SiteFooter.astro';
 import { useTranslations } from '../i18n/utils';
 import type { Lang } from '../i18n/ui';
+import plexBoldUrl from '@fontsource/ibm-plex-sans/files/ibm-plex-sans-latin-700-normal.woff2?url';
+import plexBoldItalicUrl from '@fontsource/ibm-plex-sans/files/ibm-plex-sans-latin-700-italic.woff2?url';
 
 interface Props {
   lang: Lang;
@@ -18,33 +22,37 @@ interface Props {
 }
 const { lang, description } = Astro.props;
 const t = useTranslations(lang);
+const positions = (await getCollection('experience')).length;
+const projects = (await getCollection('projects')).length;
 ---
 
 <Base title='Thiego "Zeru" Carvalho' description={description} lang={lang} path="/">
-  <DeskPoster />
+  <Fragment slot="head">
+    <link rel="preload" href={plexBoldUrl} as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href={plexBoldItalicUrl} as="font" type="font/woff2" crossorigin />
+  </Fragment>
+  <TextNav lang={lang} />
   <main>
-    <Window title='Thiego "Zeru" Carvalho' id="top" tone="accent">
-      <h1>{t('hero.title')}</h1>
-      <p class="headline">{t('hero.headline')}</p>
-      <p class="where">Osasco/SP — Brazil</p>
-    </Window>
-    <TextNav lang={lang} />
-    <Window title={t('nav.career')} id="career"><ExperienceList lang={lang} /></Window>
-    <Window title={t('nav.projects')} id="projects"><ProjectList lang={lang} /></Window>
-    <Window title={t('nav.about')} id="about"><AboutPanel lang={lang} /></Window>
-    <Window title={t('nav.contact')} id="contact" tone="accent">
-      <p>{t('contact.intro')}</p>
-      <p><a href="mailto:thiego@rocketmail.com">thiego@rocketmail.com</a></p>
+    <Hero lang={lang} />
+    <span class="hazard" aria-hidden="true"></span>
+    <Marquee />
+    <Panel title={t('nav.projects')} id="projects" index="01" label={`${projects} ${t('hud.disks')}`}>
+      <FloppyCarousel lang={lang} />
+    </Panel>
+    <Panel title={t('nav.career')} id="career" index="02" label={`${positions} ${t('hud.positions')}`}>
+      <ExperienceList lang={lang} />
+    </Panel>
+    <Panel title={t('nav.about')} id="about" index="03" label="FILE 001-ZERU"><AboutPanel lang={lang} /></Panel>
+    <Panel title={t('nav.contact')} id="contact" index="04" label={t('hud.channel')}>
+      <p class="intro">{t('contact.intro')}</p>
+      <p class="mail"><a href="mailto:thiego@rocketmail.com">thiego@rocketmail.com</a></p>
       <SocialLinks />
-    </Window>
+    </Panel>
   </main>
   <SiteFooter lang={lang} />
 </Base>
 
 <style>
-  h1 { margin: 0 0 6px; font-family: var(--font-pixel); font-size: 1.125rem; font-weight: 400; color: var(--color-accent-cyan); }
-  p { margin: 0 0 8px; }
-  .headline { color: var(--color-ink-muted); }
-  .where { margin: 0; font-size: 0.875rem; }
-  a { color: var(--color-accent-cyan); }
+  .intro { max-width: 40rem; margin: 0 0 16px; font-size: 1.25rem; }
+  .mail { margin: 0 0 20px; font-size: clamp(1.25rem, 5vw, 2.25rem); font-weight: 700; font-style: italic; }
 </style>
