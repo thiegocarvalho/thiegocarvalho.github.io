@@ -129,7 +129,16 @@ const dos = `${slug.replace(/[^a-z0-9]/gi, '').slice(0, 8).toUpperCase()}.TXT`;
     overflow: clip;
     pointer-events: none;
   }
-  .insert { width: var(--w); transform: translateY(calc(var(--w) * 0.84)); }
+  .insert {
+    width: var(--w);
+    /* Shutter end first: turned half a revolution, the metal shutter leads into
+       the slot and the label end is what stays outside. */
+    transform: translateY(calc(var(--w) * 0.84)) rotate(180deg);
+  }
+  /* The turn flips the disk's own shadow; put it back below. */
+  .insert :global(.disk) {
+    filter: drop-shadow(0 0 0.5px rgb(255 255 255 / 0.5)) drop-shadow(0 -18px 18px rgb(0 0 0 / 0.65));
+  }
   .drive {
     position: absolute;
     left: 0;
@@ -185,7 +194,7 @@ const dos = `${slug.replace(/[^a-z0-9]/gi, '').slice(0, 8).toUpperCase()}.TXT`;
   }
 
   /* Drive sequence. Every animated end state is the plain style above. */
-  @keyframes insert-disk { from { transform: none; } }
+  @keyframes insert-disk { from { transform: translateY(0) rotate(180deg); } }
   @keyframes close-up { from { margin-top: 0; } }
   @keyframes drive-led {
     0%, 100% { opacity: 1; }
