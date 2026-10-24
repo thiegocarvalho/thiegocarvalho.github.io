@@ -11,6 +11,7 @@ import silkscreenUrl from '@fontsource/silkscreen/files/silkscreen-latin-400-nor
 import plexUrl from '@fontsource/ibm-plex-sans/files/ibm-plex-sans-latin-400-normal.woff2?url';
 import { alternatesFor, htmlLang, localizePath } from '../i18n/utils';
 import type { Lang } from '../i18n/ui';
+import fx from '../scripts/fx.js?raw';
 
 interface Props {
   title: string;
@@ -52,6 +53,8 @@ const alternates = alternatesFor(path, availableLangs);
     <link rel="preload" href={silkscreenUrl} as="font" type="font/woff2" crossorigin />
     <link rel="preload" href={plexUrl} as="font" type="font/woff2" crossorigin />
     <slot name="head" />
+    {/* Shared decorative script: pointer trail and the channel-switch hook. Render-blocking so the pagereveal listener exists before the first frame; it is tiny and inline. */}
+    <script is:inline type="module" {...{ blocking: "render" }} set:html={fx} />
   </head>
   <body>
     <slot />

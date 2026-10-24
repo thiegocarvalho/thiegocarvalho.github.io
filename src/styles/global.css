@@ -67,23 +67,64 @@ button:focus-visible,
 }
 
 /*
- * One-time fade/slide as a block enters the viewport. Pure CSS and scoped to
- * browsers that support scroll-driven animations; everywhere else, and under
- * reduced motion, the block is simply there. Applied only to short blocks:
- * the entry range of a block taller than the viewport would never finish.
+ * CRT scan reveal: as a section enters the viewport a bright scanline sweeps
+ * down it and paints it in (clip-path follows the line), opening with a brief
+ * RGB-split flicker. Scroll-driven and one-shot: the keyframes only exist
+ * inside the entry range, outside it the section is simply there (fill is
+ * `backwards`, so the finished state is the plain element). Unsupported
+ * browsers and reduced motion see the content untouched. The range ends at
+ * min(whole block, 35vh), so a block at the bottom of a short page always
+ * finishes. Longhands only: the minifier would fold a shorthand and Chrome
+ * drops `animation` with a trailing view().
  */
-@keyframes reveal {
-  from { opacity: 0; transform: translateY(28px); }
-  to { opacity: 1; transform: none; }
+@property --sweep {
+  syntax: '<length-percentage>';
+  inherits: true;
+  initial-value: 100%;
+}
+@property --scan-on {
+  syntax: '<number>';
+  inherits: true;
+  initial-value: 0;
+}
+@keyframes scan-in {
+  0% {
+    --sweep: 0px;
+    --scan-on: 1;
+    filter: drop-shadow(3px 0 0 rgb(255 43 214 / 0.7)) drop-shadow(-3px 0 0 rgb(25 227 255 / 0.7));
+    translate: 4px 0;
+  }
+  6% { translate: -3px 0; opacity: 0.6; }
+  12% { translate: 2px 0; opacity: 1; }
+  18% { filter: none; translate: none; }
+  85% { --sweep: 30vh; --scan-on: 1; }
+  100% { --scan-on: 0; --sweep: calc(100% + 100vmax); filter: none; translate: none; }
 }
 @supports (animation-timeline: view()) {
   @media (prefers-reduced-motion: no-preference) {
-    .reveal {
-      animation-name: reveal;
-      animation-timing-function: linear;
-      animation-fill-mode: both;
+    [data-panel],
+    [data-contact-cta] {
+      position: relative;
+      clip-path: inset(-100vmax -100vmax calc(100% - var(--sweep)) -100vmax);
+      animation-name: scan-in;
+      animation-timing-function: ease-in;
+      animation-fill-mode: backwards;
       animation-timeline: view();
-      animation-range: entry 0% entry 70%;
+      animation-range-start: entry 0%;
+      animation-range-end: entry min(100%, 35vh);
+    }
+    [data-panel]::after,
+    [data-contact-cta]::after {
+      content: '';
+      position: absolute;
+      left: 0;
+      right: 0;
+      top: min(calc(var(--sweep) - 3px), calc(100% - 3px));
+      height: 3px;
+      pointer-events: none;
+      opacity: var(--scan-on);
+      background: #d9fbff;
+      box-shadow: 0 0 10px 2px var(--color-accent-cyan), 0 -26px 28px -4px rgb(25 227 255 / 0.28);
     }
   }
 }
@@ -104,6 +145,41 @@ button:focus-visible,
 ::view-transition-new(root) {
   animation-duration: 0.4s;
 }
+/*
+ * Channel switch for ordinary page-to-page navigation (no disk involved; the
+ * shared script puts `ch` on <html> only then, and drops it afterwards): the
+ * old page collapses to a horizontal line like a CRT switching off, then the
+ * new one opens from a line through a flash of static. About 330ms in all.
+ * Pages with a disk morph never get `ch`, so they keep the plain crossfade.
+ */
+@keyframes ch-off {
+  0% { transform: scaleY(1); filter: brightness(1); opacity: 1; }
+  70% { transform: scaleY(0.012); filter: brightness(3); opacity: 1; }
+  100% { transform: scale(0, 0.012); filter: brightness(3); opacity: 0; }
+}
+@keyframes ch-on {
+  0% { transform: scaleY(0.012); filter: brightness(3) saturate(0); }
+  45% { transform: scaleY(1); filter: brightness(1.8) saturate(0.4); }
+  100% { transform: none; filter: none; }
+}
+@keyframes ch-static { 0% { opacity: 0; } 30% { opacity: 0.5; } 100% { opacity: 0; } }
+@media (prefers-reduced-motion: no-preference) {
+  html.ch [data-disk] { view-transition-name: none !important; }
+  html.ch::view-transition-group(root) {
+    animation-duration: 0.33s;
+    background: #050507 url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence baseFrequency='.9' numOctaves='1' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .6 0 0 0 0 .9 0 0 0 0 1 0 0 0 1.4 -.35'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+  html.ch::view-transition-image-pair(root) { isolation: auto; }
+  html.ch::view-transition-old(root) {
+    animation: ch-off 0.12s cubic-bezier(0.5, 0, 0.9, 0.6) both;
+    mix-blend-mode: normal;
+  }
+  html.ch::view-transition-new(root) {
+    animation: ch-on 0.21s 0.12s cubic-bezier(0.2, 0.7, 0.3, 1) both;
+    mix-blend-mode: normal;
+  }
+}
+
 /* The disk's flight: a deliberate, eased glide rather than a jump. */
 ::view-transition-group(*.disk) {
   animation-duration: 0.55s;

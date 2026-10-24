@@ -40,7 +40,8 @@ describe('project pages', () => {
       for (const t of p.tech) expect(html).toContain(esc(t));
       if (p.url) expect(html).toContain(`href="${p.url}"`);
       if (p.repo) expect(html).toContain(`href="${p.repo}"`);
-      expect(html.match(/<script\b/g)).toHaveLength(1);
+      // Changed: two scripts now, the eject hook plus the shared fx module every page carries.
+      expect(html.match(/<script\b/g)).toHaveLength(2);
     });
 
     it('has a way back to the home projects, in the page and in the terminal, and the language switch', () => {

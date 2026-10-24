@@ -17,7 +17,7 @@ const headingId = `${id ?? slug}-title`;
 ---
 
 <section data-panel id={id} aria-labelledby={headingId}>
-  <header data-panel-head class="reveal">
+  <header data-panel-head>
     {index && <span data-panel-index aria-hidden="true">{`// ${index} —`}</span>}
     <Heading id={headingId}>{title}</Heading>
     {label && <span data-panel-label>{label}</span>}

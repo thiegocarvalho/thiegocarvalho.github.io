@@ -1,30 +1,36 @@
 import { gzipSync } from "node:zlib";
 import { allHtml, allStyles, distFiles, readDist } from "./helpers/dist";
 
-// The only pages allowed to carry script: the two home pages ship the floppy
-// carousel, and the project pages carry one tiny inline eject script (<= 1 KB
-// gzipped, asserted below). Everything else stays at zero JS.
+// Script budget: every page carries the one shared pointer-trail/channel-switch module (<= 1 KB gz,
+// see fx.test.ts); the two home pages add the floppy carousel; the project pages add one tiny
+// inline eject script (<= 1 KB gzipped, asserted below). Nothing else ships JS.
 const HOME_PAGES = ["index.html", "pt/index.html"];
 
-const scriptTags = (html: string) =>
+const allScriptTags = (html: string) =>
   [...html.matchAll(/<script\b([^>]*)>([\s\S]*?)<\/script>/g)].map((m) => ({ attrs: m[1], body: m[2] }));
+// The shared fx script is inline and carries blocking="render"; everything else is counted by the tests below.
+const isFx = (t: { attrs: string }) => /blocking=["']render["']/.test(t.attrs);
+const scriptTags = (html: string) => allScriptTags(html).filter((t) => !isFx(t));
 const isExecutable = (attrs: string) => !/type=["']?(application\/ld\+json|application\/json)/.test(attrs);
 
 describe("JavaScript budget", () => {
+  // Changed: "no script" now means no script beyond the shared fx module, which every page carries.
   it("ships no script on any page except the home and project pages", () => {
     for (const { path, html } of allHtml()) {
       if (HOME_PAGES.includes(path) || /(^|\/)projects\/[^/]+\/index\.html$/.test(path)) continue;
-      expect(html, path).not.toMatch(/<script\b/);
+      expect(scriptTags(html), path).toHaveLength(0);
     }
   });
 
-  it("ships zero JS on the profile pages (sticky timeline and scroll animation are pure CSS)", () => {
+  // Changed: was "zero JS"; the profile pages now carry only the shared fx module (sticky timeline and scroll animation stay pure CSS).
+  it("ships nothing but the shared fx module on the profile pages", () => {
     for (const page of ["about/index.html", "pt/about/index.html"]) {
-      expect(readDist(page), page).not.toMatch(/<script\b/);
+      expect(scriptTags(readDist(page)), page).toHaveLength(0);
+      expect(allScriptTags(readDist(page)), page).toHaveLength(1);
     }
   });
 
-  it("ships only one tiny inline eject script (<= 1 KB gzipped) on the 12 project pages", () => {
+  it("ships only one tiny inline eject script (<= 1 KB gzipped) besides fx on the 12 project pages", () => {
     // The script only delays navigation for the eject animation; the link works without it.
     const pages = distFiles("**/projects/*/index.html");
     expect(pages).toHaveLength(12);
@@ -54,7 +60,7 @@ describe("JavaScript budget", () => {
   it("keeps all JS on each home page under 10 KB gzipped", () => {
     for (const page of HOME_PAGES) {
       const html = readDist(page);
-      const inline = scriptTags(html).filter((t) => isExecutable(t.attrs)).map((t) => t.body);
+      const inline = allScriptTags(html).filter((t) => isExecutable(t.attrs)).map((t) => t.body);
       const external = [...html.matchAll(/<script[^>]+src="([^"]+)"/g)].map((m) => readDist(m[1].replace(/^\//, "")));
       const total = [...inline, ...external].reduce((n, js) => n + gzipSync(js).length, 0);
       expect(total, page).toBeGreaterThan(0);
