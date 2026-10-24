@@ -45,7 +45,10 @@ describe("the contact phone", () => {
     for (const { path, html } of allHtml()) {
       const cta = html.match(/<section[^>]*id="contact"[\s\S]*?<\/section>/)![0];
       expect(cta, path).toMatch(/<div class="phone[^"]*" aria-hidden="true"/);
-      expect(cta, path).toMatch(/<div class="phone[^"]*" aria-hidden="true"[^>]*>\s*<svg viewBox/);
+      // the brick phone: a 3D box-kit body with a display and 21 keys on its front
+      expect(cta, path).toMatch(/class="box brick/);
+      expect(cta, path).toMatch(/class="lcd/);
+      expect(cta.match(/<b[^>]*>(?:[0-9*#]|[A-Z]{3})<\/b>/g), path).toHaveLength(21);
       expect(cta, path).not.toContain("<script");
     }
   });
