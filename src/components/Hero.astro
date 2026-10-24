@@ -66,17 +66,16 @@ const focus = t('hero.headline').split(' · ');
     grid-template-areas:
       'tl tr'
       'main main';
-    align-content: space-between;
+    align-content: start;
     gap: 16px;
     max-width: 72rem;
-    min-height: min(46rem, calc(100svh - 52px));
     margin: 0 auto;
     padding: 24px 16px 0;
   }
-  /* Phone: no forced screen height. The block hugs its content instead of
-     stretching it apart, which was leaving dead space above the name. */
+  /* No forced screen height anywhere: the block hugs its content, so the
+     name and monitor sit right under the HUD line instead of mid-screen. */
   @media (max-width: 47.99rem) {
-    [data-hero] { min-height: 0; align-content: start; gap: 10px 16px; padding-top: 12px; }
+    [data-hero] { gap: 10px 16px; padding-top: 12px; }
     .main { padding-block: 8px 12px; gap: 22px; }
   }
   .hud {
@@ -120,10 +119,10 @@ const focus = t('hero.headline').split(' · ');
     display: grid;
     gap: 28px;
     align-items: center;
-    padding-block: 24px;
+    padding-block: 0 32px;
   }
   @media (min-width: 56rem) {
-    .main { grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.2fr); gap: 24px; }
+    .main { grid-template-columns: minmax(0, 0.7fr) minmax(0, 1.3fr); gap: 16px; }
   }
   /* each word of the name on its own line: the text runs and the accent
      become separate grid rows without any extra markup */
@@ -137,7 +136,7 @@ const focus = t('hero.headline').split(' · ');
     text-transform: uppercase;
   }
   .name em { color: var(--color-hazard); font-style: italic; }
-  @media (min-width: 56rem) { .name { font-size: clamp(2.75rem, 6.4vw, 5.25rem); } }
+  @media (min-width: 56rem) { .name { font-size: clamp(2.75rem, 5.6vw, 4.75rem); } }
 
   /* ---- the monitor: same beige hardware as the project page's drive ---- */
   /*
@@ -148,14 +147,14 @@ const focus = t('hero.headline').split(' · ');
    */
   .crt {
     width: 100%;
-    max-width: 44rem;
+    max-width: 52rem;
     justify-self: center;
     container-type: inline-size;
-    padding-block: 14cqw 6cqw;
+    padding-block: 3cqw 0;
   }
   .rig {
     position: relative;
-    width: 66cqw;
+    width: 72cqw;
     margin-left: 2cqw;
     margin-bottom: 7cqw;
     transform-style: preserve-3d;
