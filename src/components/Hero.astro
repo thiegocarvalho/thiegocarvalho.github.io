@@ -45,11 +45,10 @@ const focus = t('hero.headline').split(' · ');
           <div class="glass">
             <h1 id="hero-title">{before}<em data-text={word}>{word}</em>{after}</h1>
           </div>
-          <div class="panel" aria-hidden="true">
-            <span class="strip"></span>
-            <span class="knob"></span>
-            <span class="knob"></span>
-            <span class="pled"></span>
+          <div class="panel">
+            <span class="strip" aria-hidden="true"></span>
+            <label class="knob"><input class="pwr" type="checkbox" role="switch" checked aria-label={t('hero.power')} /></label>
+            <span class="pled" aria-hidden="true"></span>
           </div>
         </div>
       </div>
@@ -263,6 +262,10 @@ const focus = t('hero.headline').split(' · ');
     background: radial-gradient(circle at 35% 30%, #d9d2bc, #8f8975);
     box-shadow: 0 1px 0 #4e4a3c, inset 0 0 0 1px rgb(0 0 0 / 0.2);
   }
+  /* the power switch: the knob itself, no label or indicator; a wider hit area */
+  .knob { position: relative; }
+  .pwr { position: absolute; inset: -8px; margin: 0; opacity: 0; cursor: inherit; }
+  .knob:has(:focus-visible) { outline: 2px solid var(--color-accent-cyan); outline-offset: 3px; }
   .pled {
     width: 12px;
     height: 6px;
@@ -429,6 +432,22 @@ const focus = t('hero.headline').split(' · ');
       animation-fill-mode: backwards;
     }
   }
+
+  /*
+   * Switched off: the picture collapses to a line, then a dot, and the tube
+   * goes dead with the title gone. Switching back on clears these names, so
+   * the power-on above plays again from the start.
+   */
+  @keyframes power-off {
+    0% { opacity: 1; clip-path: inset(0); }
+    45% { opacity: 1; clip-path: inset(49.4% 0); }
+    85% { opacity: 1; clip-path: inset(49.4% 49.4%); }
+    100% { opacity: 0; clip-path: inset(49.4% 49.4%); }
+  }
+  .crt:has(.pwr:not(:checked)) .glass { background: #0d100f; animation-name: none; }
+  .crt:has(.pwr:not(:checked)) h1 { opacity: 0; animation-name: none; }
+  .crt:has(.pwr:not(:checked)) .pled { background: #1d3a26; box-shadow: none; animation-name: none; }
+  .crt:has(.pwr:not(:checked)) .glass::before { animation-name: power-off; animation-duration: 0.4s; animation-delay: 0s; }
 
   /*
    * Scrolling out of the hero: the name slides off to the left and shrinks,

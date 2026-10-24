@@ -17,6 +17,7 @@ export const ui = {
     // title belongs to the career section, beside the job it describes.
     // Split at the headline's own pipes; nothing here is invented.
     'hero.title': 'Software Architect & Engineer',
+    'hero.power': 'Monitor power',
     'hero.highlight': 'Software',
     'hero.headline':
       'Distributed Systems & High Concurrency · Fintech, Payment Infrastructure & Web3 · Cloud Architecture & Event-Driven Systems',
@@ -71,6 +72,7 @@ export const ui = {
     'experience.present': 'Atual',
     'nav.label': 'Seções',
     'hero.title': 'Arquiteto & Engenheiro de Software',
+    'hero.power': 'Ligar/desligar o monitor',
     'hero.highlight': 'Software',
     'hero.headline':
       'Sistemas Distribuídos & Alta Concorrência · Fintech, Infraestruturas de Pagamento & Web3 · Arquitetura Cloud & Sistemas Orientados a Eventos',

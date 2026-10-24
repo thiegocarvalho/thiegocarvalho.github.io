@@ -95,4 +95,14 @@ describe('hero CRT', () => {
     expect(sec('delay') + sec('duration')).toBeLessThanOrEqual(1.3);
     expect(css).toMatch(/prefers-reduced-motion:\s*no-preference\)\s*\{[^@]*title-on/);
   });
+  it('has one power knob: a labelled switch, on by default, that powers the tube off and on without script', () => {
+    for (const p of ['index.html', 'pt/index.html']) {
+      const html = readDist(p);
+      expect(html.match(/class="knob/g), p).toHaveLength(1);
+      expect(html, p).toMatch(/<label class="knob[^"]*"[^>]*><input[^>]*type="checkbox"[^>]*role="switch"[^>]*checked[^>]*aria-label="[^"]+"/);
+    }
+    const css = allStyles();
+    expect(css).toMatch(/\.crt[^{]*:has\(\.pwr[^)]*:not\(:checked\)\)[^{]*h1[^{]*\{[^}]*opacity:\s*0/);
+    expect(css).toMatch(/@keyframes power-off/);
+  });
 });
