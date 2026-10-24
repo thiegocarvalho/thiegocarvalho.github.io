@@ -6,7 +6,7 @@ describe('HUD panel markup', () => {
   it('renders each panel as a real <section> labelled by its heading', () => {
     // Replaces the Win3.11 window-markup assertion: the invariant is semantic structure, not bevels.
     const sections = [...page().matchAll(/<section\b[^>]*\bdata-panel\b[^>]*>([\s\S]*?)<\/section>/g)];
-    expect(sections.length).toBe(3); // changed: home is now blog + projects + contact
+    expect(sections.length).toBe(2); // changed: home is blog + projects (contact is the footer CTA)
     for (const m of sections) {
       expect(m[0]).toMatch(/aria-labelledby="([^"]+)"/);
       expect(m[1]).toMatch(/<h2\b[^>]*>\s*[^<\s][^<]*<\/h2>/);
@@ -15,7 +15,7 @@ describe('HUD panel markup', () => {
 
   it('numbers the sections in the dossier voice, hidden from assistive tech', () => {
     const html = page();
-    for (const n of ['01', '02', '03']) expect(html).toMatch(new RegExp(`data-panel-index[^>]*aria-hidden="true"[^>]*>// ${n} —`));
+    for (const n of ['01', '02']) expect(html).toMatch(new RegExp(`data-panel-index[^>]*aria-hidden="true"[^>]*>// ${n} —`));
   });
 
   it('keeps the Windows 3.11 chrome out of every page', () => {

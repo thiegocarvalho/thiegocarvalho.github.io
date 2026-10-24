@@ -85,7 +85,8 @@ it('always renders the text navigation, pointing at every destination', () => {
   for (const [page, home] of [['index.html', '/'], ['pt/index.html', '/pt/']] as const) {
     const html = readDist(page);
     expect(html).toMatch(/<nav[^>]*data-text-nav/);
-    for (const id of ['projects', 'contact']) expect(html, `${page} ${id}`).toContain(`href="${home}#${id}"`);
+    expect(html, page).toContain(`href="${home}#projects"`);
+    expect(html, page).toContain('href="#contact"'); // changed: footer CTA anchor
     expect(html, page).toContain(`href="${home}about/"`.replace('//', '/'));
   }
 });

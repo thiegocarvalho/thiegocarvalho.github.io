@@ -10,6 +10,7 @@ export const ui = {
     'nav.contact': 'Contact',
     'blog.empty': 'Nothing written here yet.',
     'blog.all': 'All posts',
+    'cta.title': "Let's talk",
     'experience.present': 'Present',
     'nav.label': 'Sections',
     // His LinkedIn headline is the title the site leads with. The current job
@@ -60,6 +61,7 @@ export const ui = {
     'nav.contact': 'Contato',
     'blog.empty': 'Nada escrito aqui ainda.',
     'blog.all': 'Todos os textos',
+    'cta.title': 'Vamos conversar',
     'experience.present': 'Atual',
     'nav.label': 'Seções',
     'hero.title': 'Arquiteto & Engenheiro de Software',

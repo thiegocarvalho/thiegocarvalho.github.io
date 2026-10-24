@@ -1,4 +1,11 @@
 ---
+/**
+ * Site footer with the contact call to action. One source for every page: the
+ * nav's CONTACT link is a same-page #contact anchor that lands here. No form
+ * and no script (the site has no backend): a mailto button and the social links.
+ */
+import PixelIcon from './PixelIcon.astro';
+import SocialLinks from './SocialLinks.astro';
 import { useTranslations } from '../i18n/utils';
 import type { Lang } from '../i18n/ui';
 
@@ -10,10 +17,51 @@ interface Props {
 
 <footer>
   <span class="hazard" aria-hidden="true"></span>
-  <p>Thiego "Zeru" Carvalho · Osasco/SP — Brazil · {t('footer.rights')}</p>
+  <section id="contact" class="cta" aria-labelledby="contact-title" data-contact-cta>
+    <p class="file" aria-hidden="true">// {t('hud.channel')}</p>
+    <h2 id="contact-title">{t('cta.title')}</h2>
+    <p class="intro">{t('contact.intro')}</p>
+    <a class="mail" href="mailto:thiego@rocketmail.com">
+      <PixelIcon name="mail" />
+      <span>thiego@rocketmail.com</span>
+    </a>
+    <SocialLinks />
+  </section>
+  <p class="legal">Thiego "Zeru" Carvalho · Osasco/SP — Brazil · {t('footer.rights')}</p>
 </footer>
 
 <style>
   footer { max-width: 72rem; margin: 0 auto; padding: 0 16px 24px; }
-  p { margin: 12px 0 0; color: var(--color-ink-muted); font-family: var(--font-pixel); font-size: 0.6875rem; letter-spacing: 0.06em; }
+  .cta { padding: clamp(40px, 7vw, 72px) 0 clamp(32px, 5vw, 48px); }
+  .file { margin: 0 0 8px; font-family: var(--font-pixel); font-size: 0.75rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--color-hazard); }
+  h2 {
+    margin: 0 0 12px;
+    font-size: clamp(2.5rem, 10vw, 6rem);
+    font-weight: 700;
+    font-style: italic;
+    line-height: 0.95;
+    letter-spacing: -0.03em;
+    text-transform: uppercase;
+  }
+  .intro { max-width: 38rem; margin: 0 0 24px; font-size: 1.125rem; line-height: 1.6; color: var(--color-ink-muted); }
+  .mail {
+    display: inline-flex;
+    align-items: center;
+    gap: 14px;
+    max-width: 100%;
+    margin: 0 0 20px;
+    padding: 16px 24px;
+    font-size: clamp(1.125rem, 4.6vw, 1.75rem);
+    font-weight: 700;
+    font-style: italic;
+    color: var(--color-void);
+    text-decoration: none;
+    background: var(--color-hazard);
+    box-shadow: 6px 6px 0 var(--color-accent-magenta);
+    transition: transform 0.12s steps(2), box-shadow 0.12s steps(2);
+  }
+  .mail span { min-width: 0; overflow-wrap: anywhere; }
+  .mail :global(.pixel-icon) { width: 1.5em; height: 1.5em; }
+  .mail:hover, .mail:focus-visible { transform: translate(3px, 3px); box-shadow: 3px 3px 0 var(--color-accent-magenta); }
+  .legal { margin: 12px 0 0; color: var(--color-ink-muted); font-family: var(--font-pixel); font-size: 0.6875rem; letter-spacing: 0.06em; }
 </style>

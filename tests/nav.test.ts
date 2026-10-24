@@ -17,7 +17,8 @@ describe('text navigation', () => {
       const nav = html.slice(html.indexOf('data-text-nav'));
       const navEnd = nav.indexOf('</nav>');
       expect(navEnd).toBeGreaterThan(-1);
-      expect(nav.slice(0, navEnd)).not.toMatch(/href="#/);
+      // Changed: #contact is deliberately a bare hash now (the footer CTA is on every page, so it resolves).
+      expect(nav.slice(0, navEnd).replace('href="#contact"', '')).not.toMatch(/href="#/);
     }
   });
 
@@ -28,7 +29,8 @@ describe('text navigation', () => {
       const pt = path.startsWith('pt/');
       const nav = html.slice(html.indexOf('data-text-nav'), html.indexOf('</nav>'));
       const home = pt ? '/pt/' : '/';
-      for (const href of [`${home}#projects`, `${home}#contact`, `${home}about/`, `${home}blog/`]) {
+      // Changed: contact is the same-page footer CTA anchor, present on every page (tests/contact-cta.test.ts).
+      for (const href of [`${home}#projects`, '#contact', `${home}about/`, `${home}blog/`]) {
         expect(nav, `${path} -> ${href}`).toContain(`href="${href}"`);
       }
     }

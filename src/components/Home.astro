@@ -6,8 +6,6 @@ import Panel from './Panel.astro';
 import Hero from './Hero.astro';
 import TextNav from './TextNav.astro';
 import FloppyCarousel from './FloppyCarousel.astro';
-import PixelIcon from './PixelIcon.astro';
-import SocialLinks from './SocialLinks.astro';
 import SiteFooter from './SiteFooter.astro';
 import { localizePath, useTranslations } from '../i18n/utils';
 import type { Lang } from '../i18n/ui';
@@ -60,21 +58,12 @@ const fmt = new Intl.DateTimeFormat(lang === 'pt' ? 'pt-BR' : 'en-GB', { dateSty
     <Panel title={t('nav.projects')} id="projects" index="02" label={`${projects} ${t('hud.disks')}`}>
       <FloppyCarousel lang={lang} />
     </Panel>
-    <Panel title={t('nav.contact')} id="contact" index="03" label={t('hud.channel')}>
-      <p class="intro">{t('contact.intro')}</p>
-      <p class="mail"><a href="mailto:thiego@rocketmail.com"><PixelIcon name="mail" /><span>thiego@rocketmail.com</span></a></p>
-      <SocialLinks />
-    </Panel>
   </main>
   <SiteFooter lang={lang} />
 </Base>
 
 <style>
   .divider { margin: clamp(32px, 6vw, 64px) 0 clamp(56px, 9vw, 96px); }
-  .intro { max-width: 40rem; margin: 0 0 16px; font-size: 1.25rem; }
-  .mail a { display: inline-flex; align-items: center; gap: 0.5em; }
-  .mail a :global(.pixel-icon) { width: 1em; height: 1em; }
-  .mail { margin: 0 0 20px; font-size: clamp(1.25rem, 5vw, 2.25rem); font-weight: 700; font-style: italic; }
   .posts { display: grid; gap: 16px; margin: 0; padding: 0; list-style: none; }
   @media (min-width: 48rem) { .posts { grid-template-columns: repeat(3, 1fr); } }
   .posts li { display: flex; flex-direction: column; gap: 6px; padding: 16px; border: 1px solid var(--color-line); border-left: 3px solid var(--color-hazard); background: var(--color-surface); }
