@@ -8,7 +8,7 @@ import TextNav from './TextNav.astro';
 import FloppyCarousel from './FloppyCarousel.astro';
 import SocialLinks from './SocialLinks.astro';
 import SiteFooter from './SiteFooter.astro';
-import { useTranslations } from '../i18n/utils';
+import { localizePath, useTranslations } from '../i18n/utils';
 import type { Lang } from '../i18n/ui';
 import plexBoldUrl from '@fontsource/ibm-plex-sans/files/ibm-plex-sans-latin-700-normal.woff2?url';
 import plexBoldItalicUrl from '@fontsource/ibm-plex-sans/files/ibm-plex-sans-latin-700-italic.woff2?url';
@@ -20,6 +20,11 @@ interface Props {
 const { lang, description } = Astro.props;
 const t = useTranslations(lang);
 const projects = (await getCollection('projects')).length;
+// The three newest published posts of this locale, newest first. Drafts never reach the build.
+const posts = (await getCollection('posts', (p) => !p.data.draft && p.id.split('/')[0] === lang))
+  .sort((a, b) => b.data.pubDate.getTime() - a.data.pubDate.getTime())
+  .slice(0, 3);
+const fmt = new Intl.DateTimeFormat(lang === 'pt' ? 'pt-BR' : 'en-GB', { dateStyle: 'long', timeZone: 'UTC' });
 ---
 
 <Base title='Thiego "Zeru" Carvalho' description={description} lang={lang} path="/">
@@ -31,10 +36,30 @@ const projects = (await getCollection('projects')).length;
   <main>
     <Hero lang={lang} />
     <span class="hazard divider" aria-hidden="true"></span>
-    <Panel title={t('nav.projects')} id="projects" index="01" label={`${projects} ${t('hud.disks')}`}>
+    <Panel title={t('nav.blog')} id="blog" index="01">
+      {
+        posts.length === 0 ? (
+          <p class="empty">{t('blog.empty')}</p>
+        ) : (
+          <>
+            <ul class="posts">
+              {posts.map((p) => (
+                <li data-post>
+                  <time datetime={p.data.pubDate.toISOString()}>{fmt.format(p.data.pubDate)}</time>
+                  <a href={localizePath(`/blog/${p.id.split('/').slice(1).join('/')}/`, lang)}>{p.data.title}</a>
+                  <p>{p.data.description}</p>
+                </li>
+              ))}
+            </ul>
+            <p class="all"><a href={localizePath('/blog/', lang)}>{t('blog.all')} →</a></p>
+          </>
+        )
+      }
+    </Panel>
+    <Panel title={t('nav.projects')} id="projects" index="02" label={`${projects} ${t('hud.disks')}`}>
       <FloppyCarousel lang={lang} />
     </Panel>
-    <Panel title={t('nav.contact')} id="contact" index="02" label={t('hud.channel')}>
+    <Panel title={t('nav.contact')} id="contact" index="03" label={t('hud.channel')}>
       <p class="intro">{t('contact.intro')}</p>
       <p class="mail"><a href="mailto:thiego@rocketmail.com">thiego@rocketmail.com</a></p>
       <SocialLinks />
@@ -47,4 +72,13 @@ const projects = (await getCollection('projects')).length;
   .divider { margin: clamp(32px, 6vw, 64px) 0 clamp(56px, 9vw, 96px); }
   .intro { max-width: 40rem; margin: 0 0 16px; font-size: 1.25rem; }
   .mail { margin: 0 0 20px; font-size: clamp(1.25rem, 5vw, 2.25rem); font-weight: 700; font-style: italic; }
+  .posts { display: grid; gap: 16px; margin: 0; padding: 0; list-style: none; }
+  @media (min-width: 48rem) { .posts { grid-template-columns: repeat(3, 1fr); } }
+  .posts li { display: flex; flex-direction: column; gap: 6px; padding: 16px; border: 1px solid var(--color-line); border-left: 3px solid var(--color-hazard); background: var(--color-surface); }
+  .posts time { font-family: var(--font-pixel); font-size: 0.6875rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--color-ink-muted); }
+  .posts li a { font-size: 1.25rem; font-weight: 700; font-style: italic; line-height: 1.2; text-decoration: none; }
+  .posts li a:hover { text-decoration: underline; }
+  .posts p { margin: 0; font-size: 0.9375rem; color: var(--color-ink-muted); }
+  .all { margin: 16px 0 0; font-family: var(--font-pixel); font-size: 0.75rem; letter-spacing: 0.06em; text-transform: uppercase; }
+  .empty { margin: 0; padding: 16px; border: 1px dashed var(--color-line-bright); color: var(--color-ink-muted); }
 </style>

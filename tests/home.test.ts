@@ -1,3 +1,4 @@
+import { ui } from '../src/i18n/ui';
 import { allStyles, readDist } from './helpers/dist';
 
 // Count elements carrying a data attribute, not mentions of it: a bundled or
@@ -69,11 +70,12 @@ it('renders the about prose on the profile page in each locale', () => {
   expect(readDist('pt/about/index.html')).toContain('1998');
 });
 
-it('keeps home to hero, projects and contact', () => {
+// Changed: the blog section now sits between hero and projects.
+it('keeps home to hero, blog, projects and contact', () => {
   for (const page of ['index.html', 'pt/index.html']) {
     const html = readDist(page);
     const ids = [...html.matchAll(/<section\b[^>]*\bid="([^"]+)"/g)].map((m) => m[1]);
-    expect(ids, page).toEqual(['top', 'projects', 'contact']);
+    expect(ids, page).toEqual(['top', 'blog', 'projects', 'contact']);
   }
 });
 
@@ -111,4 +113,38 @@ it('serves English prose on / and /about/ and Portuguese prose on /pt/ and /pt/a
   expect(readDist('pt/projects/defios/index.html')).not.toContain('Builder for an amnesic');
   expect(readDist('projects/defios/index.html')).toContain('amnesic');
   expect(readDist('index.html')).not.toContain('amnesic');
+});
+
+describe('blog section on home', () => {
+  const posts = (html: string) => [...html.matchAll(/<li[^>]*\bdata-post\b[\s\S]*?<\/li>/g)].map((m) => m[0]);
+  const block = (html: string) => html.slice(html.indexOf('id="blog"'), html.indexOf('id="projects"'));
+
+  it('puts the blog between the hero and the projects', () => {
+    for (const page of ['index.html', 'pt/index.html']) {
+      const html = readDist(page);
+      expect(html.indexOf('data-hero')).toBeLessThan(html.indexOf('id="blog"'));
+      expect(html.indexOf('id="blog"')).toBeLessThan(html.indexOf('id="projects"'));
+    }
+  });
+  it('lists the pt published post with title, date, description and a link, plus see-all', () => {
+    const html = readDist('pt/index.html');
+    const list = posts(block(html));
+    expect(list).toHaveLength(1);
+    expect(list[0]).toContain('Arquitetura de pagamentos híbridos');
+    expect(list[0]).toMatch(/<time datetime="2026-10-23/);
+    expect(list[0]).toContain('trilhos tradicionais');
+    expect(list[0]).toContain('href="/pt/blog/arquitetura-de-pagamentos-hibridos/"');
+    expect(block(html)).toContain('href="/pt/blog/"');
+    expect(readDist('pt/blog/arquitetura-de-pagamentos-hibridos/index.html')).toContain('Arquitetura de pagamentos híbridos');
+  });
+  it('shows the empty message on en, which has only a draft, with no list and no draft', () => {
+    const html = readDist('index.html');
+    expect(posts(block(html))).toHaveLength(0);
+    expect(block(html)).toContain(ui.en['blog.empty']);
+    expect(html).not.toContain('hello-world');
+    expect(html).not.toContain('Hello, world');
+  });
+  it('never lists a draft on either home', () => {
+    for (const page of ['index.html', 'pt/index.html']) expect(readDist(page)).not.toContain('hello-world');
+  });
 });
