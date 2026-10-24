@@ -15,6 +15,7 @@ export const ui = {
     // title belongs to the career section, beside the job it describes.
     // Split at the headline's own pipes; nothing here is invented.
     'hero.title': 'Software Architect & Engineer',
+    'hero.highlight': 'Software',
     'hero.headline':
       'Distributed Systems & High Concurrency · Fintech, Payment Infrastructure & Web3 · Cloud Architecture & Event-Driven Systems',
     'arrangement.on-site': 'On-site',
@@ -29,7 +30,6 @@ export const ui = {
     'contact.intro': 'Open to conversations on distributed architecture, payment systems and hard engineering problems.',
     'footer.rights': 'Built by hand, in plain HTML.',
     'hud.status': 'STATUS: AVAILABLE',
-    'hud.boot': 'BOOT: 1998 // 486 TURBO',
     'hud.positions': 'POSITIONS',
     'hud.disks': 'DISKS',
     'hud.channel': 'CHANNEL OPEN',
@@ -61,6 +61,7 @@ export const ui = {
     'experience.present': 'Atual',
     'nav.label': 'Seções',
     'hero.title': 'Arquiteto & Engenheiro de Software',
+    'hero.highlight': 'Software',
     'hero.headline':
       'Sistemas Distribuídos & Alta Concorrência · Fintech, Infraestruturas de Pagamento & Web3 · Arquitetura Cloud & Sistemas Orientados a Eventos',
     'arrangement.on-site': 'Presencial',
@@ -75,7 +76,6 @@ export const ui = {
     'contact.intro': 'Aberto a conversas sobre arquitetura distribuída, sistemas de pagamento e problemas difíceis de engenharia.',
     'footer.rights': 'Feito à mão, em HTML puro.',
     'hud.status': 'STATUS: DISPONÍVEL',
-    'hud.boot': 'BOOT: 1998 // 486 TURBO',
     'hud.positions': 'POSIÇÕES',
     'hud.disks': 'DISQUETES',
     'hud.channel': 'CANAL ABERTO',

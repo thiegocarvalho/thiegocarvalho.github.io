@@ -30,7 +30,7 @@ const projects = (await getCollection('projects')).length;
   <TextNav lang={lang} />
   <main>
     <Hero lang={lang} />
-    <span class="hazard" aria-hidden="true"></span>
+    <span class="hazard divider" aria-hidden="true"></span>
     <Panel title={t('nav.projects')} id="projects" index="01" label={`${projects} ${t('hud.disks')}`}>
       <FloppyCarousel lang={lang} />
     </Panel>
@@ -44,6 +44,7 @@ const projects = (await getCollection('projects')).length;
 </Base>
 
 <style>
+  .divider { margin: clamp(32px, 6vw, 64px) 0 clamp(56px, 9vw, 96px); }
   .intro { max-width: 40rem; margin: 0 0 16px; font-size: 1.25rem; }
   .mail { margin: 0 0 20px; font-size: clamp(1.25rem, 5vw, 2.25rem); font-weight: 700; font-style: italic; }
 </style>

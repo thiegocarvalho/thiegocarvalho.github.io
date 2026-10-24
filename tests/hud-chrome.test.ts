@@ -29,7 +29,9 @@ describe('HUD hero', () => {
   it('carries only labels grounded in the content', () => {
     const html = page();
     expect(html).toContain('FILE 001-ZERU // OSASCO/SP — BRAZIL');
-    expect(html).toContain('STACK: NODE.JS · PYTHON · SOLIDITY');
+    // STACK and BOOT labels were removed on request (the profile page covers the stack).
+    expect(html).not.toContain('STACK:');
+    expect(html).not.toContain('BOOT:');
     expect(html).toContain('STATUS: AVAILABLE');
     expect(readDist('pt/index.html')).toContain('STATUS: DISPONÍVEL');
   });
@@ -52,5 +54,21 @@ describe('HUD styles', () => {
 
   it('animates the marquee with CSS only', () => {
     expect(allStyles()).toMatch(/@keyframes\s+[\w-]*scroll/);
+  });
+});
+
+describe('hero glitch', () => {
+  it('highlights SOFTWARE with decorative glitch layers, in both locales', () => {
+    for (const p of ['index.html', 'pt/index.html']) {
+      expect(readDist(p), p).toMatch(/<em[^>]*data-text="Software"[^>]*>Software<\/em>/);
+    }
+  });
+  it('glitches in CSS only, with longhand animation, hidden from assistive tech and off under reduced motion', () => {
+    const css = allStyles();
+    expect(css).toMatch(/@keyframes glitch-a/);
+    expect(css).toMatch(/content:\s*attr\(data-text\)\s*\/\s*(""|'')/);
+    expect(css).toMatch(/animation-name:\s*glitch-a/);
+    expect(css).toMatch(/prefers-reduced-motion:\s*no-preference\)\s*\{[^@]*animation-name:\s*glitch-a/);
+    expect(css).toMatch(/animation-iteration-count:\s*infinite/);
   });
 });
