@@ -3,6 +3,47 @@ import { allHtml, allStyles } from "./helpers/dist";
 
 const fxTag = (html: string) => [...html.matchAll(/<script\b([^>]*)>([\s\S]*?)<\/script>/g)].find((m) => /blocking=["']render["']/.test(m[1]));
 
+describe("pixel cursors", () => {
+  const css = allStyles();
+  it("defines arrow, hand and I-beam cursors as SVG data URIs with a keyword fallback", () => {
+    expect(css).toMatch(/cursor:\s*url\("data:image\/svg\+xml,[^"]+"\)\s*\d+\s+\d+,\s*default/);
+    expect(css).toMatch(/cursor:\s*url\("data:image\/svg\+xml,[^"]+"\)\s*\d+\s+\d+,\s*pointer/);
+    expect(css).toMatch(/cursor:\s*url\("data:image\/svg\+xml,[^"]+"\)\s*\d+\s+\d+,\s*text/);
+  });
+  it("uses crisp pixel art no larger than 32px", () => {
+    const uris = [...css.matchAll(/cursor:\s*url\("data:image\/svg\+xml,([^"]+)"\)/g)].map((m) => decodeURIComponent(m[1]));
+    expect(uris).toHaveLength(3);
+    for (const svg of uris) {
+      expect(svg).toMatch(/crispEdges/);
+      expect(Number(svg.match(/width='(\d+)'/)![1])).toBeLessThanOrEqual(32);
+      expect(Number(svg.match(/height='(\d+)'/)![1])).toBeLessThanOrEqual(32);
+    }
+  });
+});
+
+describe("shared fx script (pointer trail + channel switch hook)", () => {
+  it("is on every page as an inline type=module, <= 1 KB gzipped", () => {
+    for (const { path, html } of allHtml()) {
+      const t = fxTag(html);
+      expect(t, path).toBeTruthy();
+      expect(t![1], path).toMatch(/type=["']module["']/);
+      expect(gzipSync(t![2]).length, path).toBeLessThanOrEqual(1024);
+    }
+  });
+  it("guards on fine pointers and reduced motion, passively, before attaching anything", () => {
+    const body = fxTag(allHtml()[0].html)![2];
+    expect(body).toContain("(pointer:fine)");
+    expect(body).toContain("prefers-reduced-motion:reduce");
+    expect(body).toMatch(/pointermove[\s\S]*passive:\s*true/);
+    expect(body).toContain("requestAnimationFrame");
+    expect(body).toContain("aria-hidden");
+    expect(body.indexOf("(pointer:fine)")).toBeLessThan(body.indexOf("pointermove"));
+  });
+  it("styles the trail as non-interactive and transform-driven", () => {
+    expect(allStyles()).toMatch(/\.trail\s*\{[^}]*pointer-events:\s*none/);
+  });
+});
+
 describe("section transitions", () => {
   const css = allStyles();
   it("reveals panels and the footer CTA with a scroll-driven scan, as longhands inside no-preference", () => {
