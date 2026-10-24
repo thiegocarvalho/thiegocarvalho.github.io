@@ -47,11 +47,14 @@ it('leads with the headline as the title, and keeps the job title in the career 
   // His LinkedIn headline is what the site leads with; "CTO & Partner" is a
   // job title and belongs beside the job it describes, not in the hero.
   const html = readDist('index.html');
-  expect(html).toContain('Osasco/SP');
-  expect(html).toMatch(/<h1[^>]*>Software Architect &amp; Engineer<\/h1>/);
+  const h1 = html.match(/<h1[^>]*>([\s\S]*?)<\/h1>/)![1];
+  // The last word is wrapped in <em> for the italic; the text itself is the i18n title.
+  expect(h1.replace(/<[^>]+>/g, '')).toBe('Software Architect &amp; Engineer');
+  expect(html).toMatch(/Thiego <em[^>]*>(?:"|&#34;|&quot;)Zeru(?:"|&#34;|&quot;)<\/em> Carvalho/);
   // Scoped to the visible hero. The meta description still names his current
   // role, which is the right copy for a search snippet.
-  const hero = html.slice(html.indexOf('<body'), html.indexOf('data-text-nav'));
+  const hero = html.slice(html.indexOf('data-hero'), html.indexOf('data-marquee'));
+  expect(hero).toContain('OSASCO/SP');
   expect(hero).not.toMatch(/CTO/);
   expect(html.slice(html.indexOf('id="career"'))).toMatch(/CTO &amp; Partner/);
 });
@@ -72,12 +75,13 @@ it('always renders the text navigation, pointing at every section', () => {
   }
 });
 
-it('lists projects in one list with a tag on each, and ships no script', () => {
+it('lists six projects with a tag on each in the server-rendered HTML', () => {
+  // Script is now allowed on the home pages (the carousel); what must hold is that
+  // the project list does not depend on it. See tests/carousel.test.ts.
   for (const page of ['index.html', 'pt/index.html']) {
     const html = readDist(page);
     expect(countAttr(html, 'data-project-entry')).toBe(6);
     expect(countAttr(html, 'data-project-tag')).toBe(6);
-    expect(html).not.toMatch(/<script/);
   }
 });
 

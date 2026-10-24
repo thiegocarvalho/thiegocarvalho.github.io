@@ -1,13 +1,28 @@
-import { allStyles, readDist } from './helpers/dist';
+import { allHtml, allStyles, distFiles } from './helpers/dist';
 
-it('ships a poster with intrinsic dimensions on both home pages', () => {
-  for (const page of ['index.html', 'pt/index.html']) {
-    const html = readDist(page);
-    expect(html).toMatch(/data-desk-poster/);
-    expect(html).toMatch(/data-desk-poster[^>]*width="\d+"[^>]*height="\d+"/);
-    expect(html).not.toMatch(/data-desk-poster[^>]*loading="lazy"/);
+// Replaces the DeskPoster assertions: the poster was a placeholder for a 3D
+// scene that is not coming, so the invariant now is that nothing of it ships.
+it('ships no desk poster, markup or asset', () => {
+  for (const { path, html } of allHtml()) expect(html, path).not.toMatch(/data-desk-poster|desk-poster/);
+  expect(distFiles('**/desk-poster*')).toEqual([]);
+});
+
+it('disables decorative motion under prefers-reduced-motion', () => {
+  const css = allStyles();
+  expect(css).toMatch(/prefers-reduced-motion:\s*reduce/);
+  expect(css).toMatch(/prefers-reduced-motion:\s*reduce\)\s*\{[^}]*\{[^}]*animation:\s*none/);
+});
+
+// The page must always scroll normally: no scroll-jacking, no gating.
+it('never locks or hijacks page scroll', () => {
+  const css = allStyles();
+  expect(css).not.toMatch(/scroll-snap-type:\s*y/);
+  expect(css).not.toMatch(/(?:^|[},\s])(?:html|body)\s*\{[^}]*overflow(?:-y)?:\s*hidden/);
+  for (const { path, html } of allHtml()) {
+    expect(html, path).not.toMatch(/addEventListener\(["']wheel["']|addEventListener\(["']touchmove["']/);
   }
 });
-it('disables decorative motion under prefers-reduced-motion', () => {
-  expect(allStyles()).toMatch(/prefers-reduced-motion/);
+
+it('scopes the scroll-in reveal to browsers with scroll-driven animations', () => {
+  expect(allStyles()).toMatch(/@supports\s*\(animation-timeline:\s*view\(\)\)/);
 });

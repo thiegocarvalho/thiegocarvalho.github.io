@@ -1,19 +1,44 @@
-import { allHtml, allStyles, distFiles } from "./helpers/dist";
+import { gzipSync } from "node:zlib";
+import { allHtml, allStyles, distFiles, readDist } from "./helpers/dist";
 
-describe("Stage A budgets", () => {
-  it("ships no JavaScript bundle in Stage A", () => {
+// The only pages allowed to carry script: the two home pages ship the floppy
+// carousel. Everything else stays at zero JS.
+const HOME_PAGES = ["index.html", "pt/index.html"];
+
+const scriptTags = (html: string) =>
+  [...html.matchAll(/<script\b([^>]*)>([\s\S]*?)<\/script>/g)].map((m) => ({ attrs: m[1], body: m[2] }));
+const isExecutable = (attrs: string) => !/type=["']?(application\/ld\+json|application\/json)/.test(attrs);
+
+describe("JavaScript budget", () => {
+  it("ships no script on any page except the home pages", () => {
     for (const { path, html } of allHtml()) {
-      expect(html, path).not.toMatch(/<script[^>]+src=/);
+      if (HOME_PAGES.includes(path)) continue;
+      expect(html, path).not.toMatch(/<script\b/);
     }
-    expect(distFiles("**/*.js")).toEqual([]);
   });
 
-  it("ships no executable inline script either", () => {
-    for (const { path, html } of allHtml()) {
-      const executable = [...html.matchAll(/<script\b([^>]*)>/g)].filter(
-        (m) => !/type=["']?(application\/ld\+json|application\/json)/.test(m[1]),
-      );
-      expect(executable.length, path).toBe(0);
+  it("emits JS bundles only for the home pages' carousel", () => {
+    // Every emitted .js file must be referenced by a home page; nothing else may ship one.
+    const referenced = HOME_PAGES.flatMap((p) => [...readDist(p).matchAll(/<script[^>]+src="([^"]+)"/g)].map((m) => m[1].replace(/^\//, "")));
+    expect(distFiles("**/*.js").sort()).toEqual([...new Set(referenced)].sort());
+  });
+
+  it("loads home-page script as type=module only", () => {
+    for (const page of HOME_PAGES) {
+      const tags = scriptTags(readDist(page)).filter((t) => isExecutable(t.attrs));
+      expect(tags.length, page).toBeGreaterThan(0);
+      for (const t of tags) expect(t.attrs, page).toMatch(/type=["']module["']/);
+    }
+  });
+
+  it("keeps all JS on each home page under 10 KB gzipped", () => {
+    for (const page of HOME_PAGES) {
+      const html = readDist(page);
+      const inline = scriptTags(html).filter((t) => isExecutable(t.attrs)).map((t) => t.body);
+      const external = [...html.matchAll(/<script[^>]+src="([^"]+)"/g)].map((m) => readDist(m[1].replace(/^\//, "")));
+      const total = [...inline, ...external].reduce((n, js) => n + gzipSync(js).length, 0);
+      expect(total, page).toBeGreaterThan(0);
+      expect(total, page).toBeLessThan(10 * 1024);
     }
   });
 
