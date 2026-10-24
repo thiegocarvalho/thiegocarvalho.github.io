@@ -45,7 +45,7 @@ const Inner = href ? 'a' : 'div';
     aria-label={href ? `${name}, ${tag} (${index + 1} ${t('projects.of')} ${total})` : undefined}
   >
     <span class="floppy" aria-hidden="true">
-      <span class="print">3.5″ HD</span>
+      <span class="print">3.5″<br />HD</span>
       <span class="shutter"><span class="window"></span></span>
       <span class="label">
         <span class="name">{name}</span>
@@ -114,10 +114,13 @@ const Inner = href ? 'a' : 'div';
 
   .print {
     position: absolute;
-    left: 5cqw;
+    left: 4cqw;
     top: 5cqw;
+    /* Stacked in the strip left of the shutter (4-24cqw) so it is never covered. */
+    width: 18cqw;
+    line-height: 1.35;
     font-family: var(--font-pixel);
-    font-size: 4.5cqw;
+    font-size: 4.2cqw;
     letter-spacing: 0.06em;
     color: rgb(255 255 255 / 0.7);
   }
