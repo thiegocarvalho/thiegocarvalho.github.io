@@ -52,13 +52,17 @@ const Inner = href ? 'a' : 'div';
     <span class="face edge e-b"></span>
     <span class="face edge e-c"></span>
     <span class="floppy">
-      <span class="print">3.5″<br />HD</span>
+      <span class="track-strip"></span>
+      <span class="arrow"></span>
+      <span class="print">HD</span>
       <span class="shutter"><span class="window"></span></span>
+      <span class="recess"></span>
       <span class="label">
         <span class="name">{name}</span>
         <span class="tagline">{tag}</span>
       </span>
-      <span class="notch"></span>
+      <span class="hole l"></span>
+      <span class="hole r"></span>
     </span>
     </span>
   </Inner>
@@ -75,7 +79,7 @@ const Inner = href ? 'a' : 'div';
     .slot { margin-inline: 8px; }
   }
   .slot.standalone { margin-inline: 0; }
-  .slot { --disk: #2f4a6b; --band: var(--color-accent-cyan); }
+  .slot { --disk: #34495f; --band: var(--color-accent-cyan); }
 
   .disk {
     display: block;
@@ -125,81 +129,114 @@ const Inner = href ? 'a' : 'div';
     transform: translateZ(calc(var(--t) / -2)) rotateY(180deg);
     backface-visibility: visible;
     background: var(--edge);
-    clip-path: polygon(0 0, 88% 0, 100% 12%, 100% 100%, 0 100%);
+    clip-path: polygon(0 0, 95% 0, 100% 5%, 100% 100%, 0 100%);
   }
   .edge { background: linear-gradient(var(--edge), color-mix(in srgb, var(--edge), black 35%)); backface-visibility: visible; }
-  .e-r, .e-l { top: 12%; bottom: 0; width: var(--t); transform: rotateY(90deg); }
+  .e-r, .e-l { top: 5%; bottom: 0; width: var(--t); transform: rotateY(90deg); }
   .e-l { top: 0; left: calc(var(--t) / -2); }
   .e-r { right: calc(var(--t) / -2); }
-  .e-t, .e-b { left: 0; width: 88%; height: var(--t); transform: rotateX(90deg); }
+  .e-t, .e-b { left: 0; width: 95%; height: var(--t); transform: rotateX(90deg); }
   .e-t { top: calc(var(--t) / -2); }
   .e-b { width: 100%; bottom: calc(var(--t) / -2); }
-  /* the one chamfered corner, top right: 12% x 12% of the body, so 0.1697 long */
+  /* the one chamfered corner, top right: 5% x 5% of the body, so 0.0707 long */
   .e-c {
-    left: 88%;
+    left: 95%;
     top: calc(var(--t) / -2);
-    width: calc(var(--w) * 0.1697);
+    width: calc(var(--w) * 0.0707);
     height: var(--t);
     transform-origin: 0 50%;
     transform: rotate(45deg) rotateX(90deg);
   }
 
-  /* The floppy. Everything is sized in cqw so it scales with the disk. */
+  /*
+   * The floppy face, drawn after a real 90 x 94 mm disk: matte, one flat
+   * plane. Everything is sized in cqw so it scales with the disk. Corners are
+   * square; the single chamfer is top right.
+   */
   .floppy {
     position: relative;
     display: block;
     aspect-ratio: 1;
     container-type: inline-size;
-    background:
-      linear-gradient(118deg, rgb(255 255 255 / 0.2), rgb(255 255 255 / 0.04) 32%, transparent 33%, rgb(0 0 0 / 0.14)),
-      linear-gradient(150deg, color-mix(in srgb, var(--disk), white 14%), var(--disk) 55%);
-    box-shadow: inset 0 0 0 0.7cqw rgb(0 0 0 / 0.28), inset 0.9cqw 0.9cqw 0 rgb(255 255 255 / 0.1);
-    clip-path: polygon(0 0, 88% 0, 100% 12%, 100% 100%, 0 100%);
+    background: linear-gradient(180deg, color-mix(in srgb, var(--disk), white 4%), color-mix(in srgb, var(--disk), black 4%));
+    clip-path: polygon(0 0, 95% 0, 100% 5%, 100% 100%, 0 100%);
   }
-  [data-variant='1'] { --disk: #6b2f5e; --band: var(--color-accent-magenta); }
-  [data-variant='2'] { --disk: #3f4350; --band: var(--color-hazard); }
-  [data-variant='3'] { --disk: #1f6b73; --band: var(--color-accent-magenta); }
-  [data-variant='4'] { --disk: #7a6a1c; --band: var(--color-accent-cyan); }
-  [data-variant='5'] { --disk: #3a6b3a; --band: var(--color-hazard); }
+  [data-variant='1'] { --disk: #6b3d62; --band: var(--color-accent-magenta); }
+  [data-variant='2'] { --disk: #42454f; --band: var(--color-hazard); }
+  [data-variant='3'] { --disk: #2e6268; --band: var(--color-accent-magenta); }
+  [data-variant='4'] { --disk: #6f6528; --band: var(--color-accent-cyan); }
+  [data-variant='5'] { --disk: #44663f; --band: var(--color-hazard); }
 
+  /* where the shutter slides, a shade darker */
+  .track-strip {
+    position: absolute;
+    left: 5cqw;
+    top: 0;
+    width: 17cqw;
+    height: 33cqw;
+    background: color-mix(in srgb, var(--disk), black 14%);
+    box-shadow: inset 0 0.4cqw 0.6cqw rgb(0 0 0 / 0.25);
+  }
+  /* insertion arrow, embossed */
+  .arrow {
+    position: absolute;
+    left: 10cqw;
+    top: 8cqw;
+    width: 6cqw;
+    height: 6cqw;
+    background: color-mix(in srgb, var(--disk), white 16%);
+    clip-path: polygon(50% 0, 100% 100%, 0 100%);
+  }
   .print {
     position: absolute;
-    left: 4cqw;
-    top: 5cqw;
-    /* Stacked in the strip left of the shutter (4-24cqw) so it is never covered. */
-    width: 18cqw;
-    line-height: 1.35;
+    left: 78cqw;
+    top: 4.5cqw;
+    padding: 0.6cqw 1.2cqw 0.2cqw;
     font-family: var(--font-pixel);
-    font-size: 4.2cqw;
-    letter-spacing: 0.06em;
-    color: rgb(255 255 255 / 0.7);
+    font-size: 4.6cqw;
+    line-height: 1;
+    letter-spacing: 0.08em;
+    color: color-mix(in srgb, var(--disk), white 38%);
+    border: 0.5cqw solid currentColor;
+    /* too small to read on the far disks of the fan */
+    opacity: clamp(0, calc(1.6 - var(--a, 0)), 1);
   }
   .shutter {
     position: absolute;
-    left: 24cqw;
+    left: 22cqw;
     top: 0;
-    width: 54cqw;
-    height: 31cqw;
+    width: 50cqw;
+    height: 33cqw;
     background:
-      repeating-linear-gradient(90deg, rgb(255 255 255 / 0.1) 0 0.3cqw, transparent 0.3cqw 0.8cqw),
-      linear-gradient(90deg, #8d929d, #e6e9ee 28%, #b4b9c3 62%, #8a8f9a);
-    box-shadow: inset 0 -1cqw 0 rgb(0 0 0 / 0.18), 0 1.2cqw 1.6cqw rgb(0 0 0 / 0.5), 0 0 0 0.3cqw rgb(0 0 0 / 0.25);
+      repeating-linear-gradient(0deg, rgb(255 255 255 / 0.28) 0 0.25cqw, rgb(0 0 0 / 0.07) 0.25cqw 0.55cqw),
+      #a7acb4;
+    box-shadow: 0 0.5cqw 0.8cqw rgb(0 0 0 / 0.35);
   }
   .window {
     position: absolute;
-    right: 6cqw;
+    right: 5cqw;
     top: 4cqw;
-    width: 11cqw;
-    height: 21cqw;
+    width: 12.5cqw;
+    height: 22cqw;
     background: #101217;
     box-shadow: inset 0.8cqw 0.8cqw 0 rgb(0 0 0 / 0.6);
   }
+  /* the shallow recess the label sits in */
+  .recess {
+    position: absolute;
+    left: 6cqw;
+    right: 6cqw;
+    top: 38cqw;
+    bottom: 10cqw;
+    background: color-mix(in srgb, var(--disk), white 9%);
+    box-shadow: inset 0.5cqw 0.5cqw 0 rgb(0 0 0 / 0.3);
+  }
   .label {
     position: absolute;
-    left: 10cqw;
-    right: 10cqw;
+    left: 8cqw;
+    right: 8cqw;
     top: 40cqw;
-    bottom: 8cqw;
+    bottom: 12cqw;
     display: flex;
     flex-direction: column;
     justify-content: space-between;
@@ -209,7 +246,6 @@ const Inner = href ? 'a' : 'div';
       linear-gradient(var(--band) 0 0) top / 100% 5cqw no-repeat,
       repeating-linear-gradient(transparent 0 7.2cqw, rgb(40 70 120 / 0.28) 7.2cqw 7.6cqw),
       #f5efd9;
-    box-shadow: 0 0.6cqw 1.2cqw rgb(0 0 0 / 0.35), inset 0 0 0 0.3cqw rgb(255 255 255 / 0.55), 0 0 0 0.4cqw rgb(0 0 0 / 0.3);
   }
   .name {
     display: block;
@@ -235,13 +271,14 @@ const Inner = href ? 'a' : 'div';
     text-decoration-thickness: 0.5cqw;
     text-underline-offset: 1cqw;
   }
-  .notch {
+  /* write-protect window and HD hole */
+  .hole {
     position: absolute;
-    right: 4cqw;
-    bottom: 3cqw;
-    width: 5cqw;
-    height: 5cqw;
+    bottom: 2.5cqw;
+    width: 4.5cqw;
+    height: 4.5cqw;
     background: #08090c;
-    box-shadow: inset 0 -2cqw 0 rgb(255 255 255 / 0.55);
   }
+  .hole.l { left: 6cqw; }
+  .hole.r { right: 6cqw; }
 </style>
