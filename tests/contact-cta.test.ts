@@ -45,7 +45,7 @@ describe("the contact phone", () => {
     for (const { path, html } of allHtml()) {
       const cta = html.match(/<section[^>]*id="contact"[\s\S]*?<\/section>/)![0];
       expect(cta, path).toMatch(/<div class="phone[^"]*" aria-hidden="true"/);
-      expect(cta, path).toMatch(/class="dial/);
+      expect(cta, path).toMatch(/<div class="phone[^"]*" aria-hidden="true"[^>]*>\s*<svg viewBox/);
       expect(cta, path).not.toContain("<script");
     }
   });
