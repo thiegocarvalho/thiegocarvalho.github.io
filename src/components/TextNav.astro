@@ -1,8 +1,8 @@
 ---
 /**
  * The always-present text navigation. Primary, not a fallback: it serves
- * keyboard, screen reader and crawler, and it is why a 3D layer can never
- * be the only way to reach the information.
+ * keyboard, screen reader and crawler on every page, whatever else is
+ * enhanced on top of it.
  */
 import { localizePath } from '../i18n/utils';
 import { useTranslations } from '../i18n/utils';
@@ -19,8 +19,8 @@ const t = useTranslations(lang);
 // a section that is not on the page and silently do nothing.
 const home = localizePath('/', lang);
 const items = [
-  { id: 'career', href: `${home}#career`, label: t('nav.career') },
   { id: 'projects', href: `${home}#projects`, label: t('nav.projects') },
+  { id: 'career', href: `${home}#career`, label: t('nav.career') },
   { id: 'about', href: `${home}#about`, label: t('nav.about') },
   { id: 'blog', href: localizePath('/blog/', lang), label: t('nav.blog') },
   { id: 'contact', href: `${home}#contact`, label: t('nav.contact') },
@@ -43,6 +43,7 @@ const switchHref = localizePath(mirrored ? logical : '/', other);
 ---
 
 <nav data-text-nav aria-label={t('nav.label')}>
+  <a class="brand" href={home} aria-label="Thiego Zeru Carvalho">ZERU<span aria-hidden="true">//</span></a>
   <ul>
     {items.map((i) => (
       <li><a href={i.href} aria-current={current === i.id ? 'page' : undefined}>{i.label}</a></li>
@@ -56,24 +57,45 @@ const switchHref = localizePath(mirrored ? logical : '/', other);
 </nav>
 
 <style>
-  nav { max-width: 48rem; margin: 0 auto 16px; }
-  ul { display: flex; flex-wrap: wrap; gap: 6px; list-style: none; margin: 0; padding: 0; }
-  a {
-    display: block;
-    padding: 6px 10px;
-    font-family: var(--font-pixel);
-    font-size: 0.8125rem;
-    text-transform: uppercase;
+  nav {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 4px 20px;
+    padding: 10px 16px;
+    background: rgb(5 5 7 / 0.92);
+    border-bottom: 1px solid var(--color-line);
+    z-index: 20;
+  }
+  @media (min-width: 48rem) {
+    nav { position: sticky; top: 0; padding-inline: max(16px, calc((100% - 72rem) / 2 + 16px)); }
+  }
+  @media (max-width: 47.99rem) { .brand { display: none; } li a { padding-inline: 6px; font-size: 0.6875rem; } nav { padding-inline: 10px; } }
+  .brand {
+    font-family: var(--font-body);
+    font-weight: 700;
+    font-style: italic;
+    font-size: 1.125rem;
+    letter-spacing: -0.02em;
     color: var(--color-ink);
     text-decoration: none;
-    background: var(--color-surface);
-    border: 1px solid var(--color-bevel-dark);
-    border-radius: 0;
-    box-shadow: inset 1px 1px 0 var(--color-bevel-light), inset -1px -1px 0 var(--color-bevel-dark);
   }
-  a:hover, a[aria-current] { color: var(--color-accent-cyan); }
+  .brand span { color: var(--color-hazard); }
+  ul { display: flex; flex: 1; flex-wrap: wrap; gap: 0 4px; list-style: none; margin: 0; padding: 0; }
+  li a {
+    display: block;
+    padding: 8px 8px;
+    font-family: var(--font-pixel);
+    font-size: 0.75rem;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--color-ink-muted);
+    text-decoration: none;
+    border-bottom: 2px solid transparent;
+  }
+  li a:hover { color: var(--color-accent-cyan); }
+  li a[aria-current] { color: var(--color-ink); border-bottom-color: var(--color-hazard); }
   [data-lang-switch] { margin-inline-start: auto; }
-  [data-lang-switch] a { color: var(--color-ink-muted); text-transform: none; }
-  [data-lang-switch] a:hover { color: var(--color-accent-cyan); }
-  a:focus-visible { outline: 2px solid var(--color-accent-magenta); outline-offset: 2px; }
+  [data-lang-switch] a { color: var(--color-accent-magenta); text-transform: none; }
+  [data-lang-switch] a:hover { color: var(--color-ink); }
 </style>

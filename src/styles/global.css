@@ -1,55 +1,81 @@
 @import "tailwindcss";
 
 /*
- * Night City, by way of Windows 3.11: graphite and black, cyan and magenta
- * accents. Tokens are named by role, not hue. `static` keeps every token in the
- * output even when no utility references it yet.
+ * Classified dossier, Night City edition: near-black surfaces, cyan and
+ * magenta accents, hazard yellow for stripes and file numbers. Tokens are
+ * named by role, not hue. `static` keeps every token in the output even when
+ * no utility references it.
  */
 @theme static {
   --color-void: #050507;
-  --color-surface: #1b1c21;
-  --color-surface-raised: #25272e;
-  --color-bevel-light: #6b6f7b;
-  --color-bevel-dark: #08080a;
-  --color-ink: #dfe2ea;
+  --color-surface: #0d0e12;
+  --color-surface-raised: #16181f;
+  --color-line: #2a2d38;
+  --color-line-bright: #4a4f60;
+  --color-ink: #e6e8ee;
   --color-ink-muted: #9aa0ae;
-  /*
-   * Full chroma is reserved for accents that are genuinely small: links,
-   * focus rings, hover. Filling a whole title bar with it made the accent
-   * the largest coloured area on the page, and six stacked windows read as
-   * a wall of cyan.
-   */
   --color-accent-cyan: #19e3ff;
   --color-accent-magenta: #ff2bd6;
+  --color-hazard: #ffd60a;
 
-  /* Title-bar fills: same hues, taken down far enough to sit behind text. */
-  --color-bar-cyan: #14555f;
-  --color-bar-magenta: #5f1452;
-
-  /* Pixel display face for chrome and headings; plain sans for reading. */
   --font-pixel: "Silkscreen", "VT323", ui-monospace, "Courier New", monospace;
   --font-body: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
-
-  --spacing-bevel: 2px;
 }
 
 html {
   background: var(--color-void);
   color: var(--color-ink);
   font-family: var(--font-body);
+  scroll-padding-top: 4rem;
 }
 
 body {
   margin: 0;
   min-height: 100vh;
-  padding: 16px;
   overflow-wrap: anywhere;
-  /* Two-pixel scanlines, hard-edged. */
-  background-image: repeating-linear-gradient(
-    to bottom,
-    transparent 0 2px,
-    rgb(0 0 0 / 0.35) 2px 3px
+  overflow-x: clip;
+  background-image:
+    linear-gradient(rgb(25 227 255 / 0.035) 1px, transparent 1px),
+    linear-gradient(90deg, rgb(25 227 255 / 0.035) 1px, transparent 1px);
+  background-size: 48px 48px;
+}
+
+a:focus-visible,
+button:focus-visible,
+[tabindex]:focus-visible {
+  outline: 2px solid var(--color-hazard);
+  outline-offset: 3px;
+}
+
+/* Yellow-on-black caution tape, used as an accent and never as content. */
+.hazard {
+  display: block;
+  height: 10px;
+  background: repeating-linear-gradient(
+    -45deg,
+    var(--color-hazard) 0 12px,
+    var(--color-void) 12px 24px
   );
+}
+
+/*
+ * One-time fade/slide as a block enters the viewport. Pure CSS and scoped to
+ * browsers that support scroll-driven animations; everywhere else, and under
+ * reduced motion, the block is simply there. Applied only to short blocks:
+ * the entry range of a block taller than the viewport would never finish.
+ */
+@keyframes reveal {
+  from { opacity: 0; transform: translateY(28px); }
+  to { opacity: 1; transform: none; }
+}
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    .reveal {
+      animation: reveal linear both;
+      animation-timeline: view();
+      animation-range: entry 0% entry 70%;
+    }
+  }
 }
 
 /*
@@ -61,8 +87,7 @@ body {
   *,
   *::before,
   *::after {
-    animation-duration: 0.01ms !important;
-    animation-iteration-count: 1 !important;
+    animation: none !important;
     transition-duration: 0.01ms !important;
     scroll-behavior: auto !important;
   }

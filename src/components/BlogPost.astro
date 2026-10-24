@@ -2,7 +2,7 @@
 /** One post page. Alternates are limited to the locales the post exists in. */
 import { render, type CollectionEntry } from 'astro:content';
 import Base from '../layouts/Base.astro';
-import Window from './Window.astro';
+import Panel from './Panel.astro';
 import TextNav from './TextNav.astro';
 import SiteFooter from './SiteFooter.astro';
 import type { Lang } from '../i18n/ui';
@@ -25,21 +25,19 @@ const fmt = new Intl.DateTimeFormat(lang === 'pt' ? 'pt-BR' : 'en-GB', { dateSty
   path={`/blog/${slug}/`}
   availableLangs={availableLangs}
 >
+  <TextNav lang={lang} current="blog" />
   <main>
-    <Window title={post.data.title} id="post">
-      <h1>{post.data.title}</h1>
+    <Panel heading="h1" title={post.data.title} id="post">
       <time datetime={post.data.pubDate.toISOString()}>{fmt.format(post.data.pubDate)}</time>
       <div class="prose"><Content /></div>
-    </Window>
-    <TextNav lang={lang} current="blog" />
+    </Panel>
   </main>
   <SiteFooter lang={lang} />
 </Base>
 
 <style>
-  h1 { margin: 0 0 4px; font-family: var(--font-pixel); font-size: 1.125rem; font-weight: 400; color: var(--color-accent-cyan); }
-  time { display: block; margin-bottom: 12px; font-size: 0.875rem; color: var(--color-ink-muted); }
-  .prose :global(h2) { margin: 16px 0 6px; font-family: var(--font-pixel); font-size: 1rem; font-weight: 400; }
+  time { display: block; margin-bottom: 16px; font-family: var(--font-pixel); text-transform: uppercase; font-size: 0.875rem; color: var(--color-ink-muted); }
+  .prose :global(h2) { margin: 24px 0 6px; font-size: 1.5rem; font-weight: 700; }
   .prose :global(p) { margin: 0 0 10px; overflow-wrap: anywhere; }
   .prose :global(a) { color: var(--color-accent-cyan); }
 </style>

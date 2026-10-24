@@ -1,0 +1,151 @@
+---
+/**
+ * Dossier-style hero. Every label is a fact already on the page: location,
+ * stack, availability and the year the journey started all come from the
+ * content and the about text.
+ */
+import { useTranslations } from '../i18n/utils';
+import type { Lang } from '../i18n/ui';
+
+interface Props {
+  lang: Lang;
+}
+const { lang } = Astro.props;
+const t = useTranslations(lang);
+
+const words = t('hero.title').split(' ');
+const last = words.pop();
+const lead = words.join(' ');
+const focus = t('hero.headline').split(' · ');
+---
+
+<section data-hero id="top" aria-labelledby="hero-title">
+  <p class="hud tl">FILE 001-ZERU // OSASCO/SP — BRAZIL</p>
+  <p class="hud tr"><span class="dot" aria-hidden="true"></span>{t('hud.status')}</p>
+  <p class="side" aria-hidden="true">{t('hud.side')}</p>
+
+  <div class="main">
+    <p class="name">Thiego <em>"Zeru"</em> Carvalho</p>
+    <h1 id="hero-title">{lead} <em>{last}</em></h1>
+    <p class="headline">
+      {focus.map((f) => <span>{f}</span>)}
+    </p>
+  </div>
+
+  <p class="hud bl">STACK: NODE.JS · PYTHON · SOLIDITY</p>
+  <div class="br">
+    <span class="barcode" aria-hidden="true"></span>
+    <p class="hud">{t('hud.boot')}</p>
+  </div>
+</section>
+
+<style>
+  [data-hero] {
+    position: relative;
+    box-sizing: border-box;
+    display: grid;
+    grid-template-columns: 1fr auto;
+    grid-template-areas:
+      'tl tr'
+      'main main'
+      'bl br';
+    align-content: space-between;
+    gap: 16px;
+    max-width: 72rem;
+    min-height: min(46rem, calc(100svh - 52px));
+    margin: 0 auto;
+    padding: 24px 16px 20px;
+  }
+  .hud {
+    margin: 0;
+    font-family: var(--font-pixel);
+    font-size: 0.6875rem;
+    letter-spacing: 0.08em;
+    color: var(--color-ink-muted);
+  }
+  .tl { grid-area: tl; color: var(--color-accent-cyan); }
+  .tr { grid-area: tr; color: var(--color-hazard); text-align: right; white-space: nowrap; }
+  .bl { grid-area: bl; align-self: end; }
+  .br { grid-area: br; display: flex; flex-direction: column; align-items: flex-end; gap: 6px; }
+  .dot {
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    margin-right: 8px;
+    background: var(--color-hazard);
+    animation: blink 1.6s steps(2, jump-none) infinite;
+  }
+  @keyframes blink { 50% { opacity: 0.2; } }
+  .barcode {
+    width: 96px;
+    height: 28px;
+    background: repeating-linear-gradient(
+      90deg,
+      var(--color-ink) 0 2px,
+      transparent 2px 4px,
+      var(--color-ink) 4px 5px,
+      transparent 5px 9px,
+      var(--color-ink) 9px 12px,
+      transparent 12px 13px,
+      var(--color-ink) 13px 14px,
+      transparent 14px 18px
+    );
+    opacity: 0.8;
+  }
+  .side {
+    display: none;
+    position: absolute;
+    right: -6px;
+    top: 50%;
+    margin: 0;
+    font-family: var(--font-pixel);
+    font-size: 0.6875rem;
+    letter-spacing: 0.3em;
+    color: var(--color-line-bright);
+    writing-mode: vertical-rl;
+    transform: translateY(-50%) rotate(180deg);
+    white-space: nowrap;
+  }
+  @media (min-width: 80rem) { .side { display: block; } }
+  .main { grid-area: main; align-self: center; padding-block: 24px; }
+  .name {
+    margin: 0 0 12px;
+    font-weight: 700;
+    font-size: clamp(1.125rem, 3.4vw, 2rem);
+    letter-spacing: -0.01em;
+    text-transform: uppercase;
+  }
+  .name em { color: var(--color-hazard); }
+  h1 {
+    margin: 0;
+    font-family: var(--font-body);
+    font-weight: 700;
+    font-size: clamp(2.9rem, 14vw, 10.5rem);
+    line-height: 0.88;
+    letter-spacing: -0.045em;
+    text-transform: uppercase;
+    text-wrap: balance;
+    overflow-wrap: normal;
+  }
+  h1 em {
+    font-style: italic;
+    padding-right: 0.08em;
+    color: var(--color-accent-cyan);
+    text-shadow: 0.04em 0.04em 0 var(--color-accent-magenta);
+  }
+  .headline {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px 8px;
+    max-width: 52rem;
+    margin: 28px 0 0;
+    padding: 0;
+  }
+  .headline span {
+    padding: 4px 10px;
+    font-size: 0.8125rem;
+    line-height: 1.3;
+    color: var(--color-ink);
+    border: 1px solid var(--color-line-bright);
+  }
+</style>

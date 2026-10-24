@@ -5,6 +5,8 @@ import '../styles/global.css';
 import '@fontsource/silkscreen/latin-400.css';
 import '@fontsource/ibm-plex-sans/latin-400.css';
 import '@fontsource/ibm-plex-sans/latin-600.css';
+import '@fontsource/ibm-plex-sans/latin-700.css';
+import '@fontsource/ibm-plex-sans/latin-700-italic.css';
 import silkscreenUrl from '@fontsource/silkscreen/files/silkscreen-latin-400-normal.woff2?url';
 import plexUrl from '@fontsource/ibm-plex-sans/files/ibm-plex-sans-latin-400-normal.woff2?url';
 import { alternatesFor, htmlLang, localizePath } from '../i18n/utils';
@@ -46,6 +48,7 @@ const alternates = alternatesFor(path, availableLangs);
     <link rel="sitemap" href="/sitemap-index.xml" />
     <link rel="preload" href={silkscreenUrl} as="font" type="font/woff2" crossorigin />
     <link rel="preload" href={plexUrl} as="font" type="font/woff2" crossorigin />
+    <slot name="head" />
   </head>
   <body>
     <slot />

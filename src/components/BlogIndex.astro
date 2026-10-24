@@ -2,7 +2,7 @@
 /** Blog index for one locale, shared by both routes so they cannot drift. */
 import { getCollection } from 'astro:content';
 import Base from '../layouts/Base.astro';
-import Window from './Window.astro';
+import Panel from './Panel.astro';
 import TextNav from './TextNav.astro';
 import SiteFooter from './SiteFooter.astro';
 import { localizePath, useTranslations } from '../i18n/utils';
@@ -21,9 +21,9 @@ const description = lang === 'pt' ? 'Textos sobre arquitetura, pagamentos e prod
 ---
 
 <Base title={`${t('nav.blog')} — Thiego "Zeru" Carvalho`} description={description} lang={lang} path="/blog/">
+  <TextNav lang={lang} current="blog" />
   <main>
-    <Window title={t('nav.blog')} id="blog">
-      <h1>{t('nav.blog')}</h1>
+    <Panel heading="h1" title={t('nav.blog')} id="blog">
       {
         posts.length === 0 ? (
           <p>{t('blog.empty')}</p>
@@ -42,14 +42,12 @@ const description = lang === 'pt' ? 'Textos sobre arquitetura, pagamentos e prod
           </ul>
         )
       }
-    </Window>
-    <TextNav lang={lang} current="blog" />
+    </Panel>
   </main>
   <SiteFooter lang={lang} />
 </Base>
 
 <style>
-  h1 { margin: 0 0 8px; font-family: var(--font-pixel); font-size: 1.125rem; font-weight: 400; color: var(--color-accent-cyan); }
   ul { list-style: none; margin: 0; padding: 0; }
   li { margin: 0 0 12px; }
   li p { margin: 2px 0 0; color: var(--color-ink-muted); }

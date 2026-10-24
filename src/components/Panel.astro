@@ -1,0 +1,77 @@
+---
+/**
+ * A HUD panel: thin border, corner brackets, and a header in the dossier
+ * voice (`// 02 — CAREER`). A real <section> labelled by its heading.
+ */
+interface Props {
+  title: string;
+  id?: string;
+  index?: string;
+  label?: string;
+  heading?: 'h1' | 'h2';
+}
+
+const { title, id, index, label, heading: Heading = 'h2' } = Astro.props;
+const slug = title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '') || 'panel';
+const headingId = `${id ?? slug}-title`;
+---
+
+<section data-panel id={id} aria-labelledby={headingId}>
+  <header data-panel-head class="reveal">
+    {index && <span data-panel-index aria-hidden="true">{`// ${index} —`}</span>}
+    <Heading id={headingId}>{title}</Heading>
+    {label && <span data-panel-label>{label}</span>}
+  </header>
+  <div data-panel-body><slot /></div>
+</section>
+
+<style is:global>
+  [data-panel] {
+    position: relative;
+    box-sizing: border-box;
+    width: 100%;
+    max-width: 72rem;
+    min-width: 0;
+    margin: 0 auto 56px;
+    padding: 0 16px;
+  }
+  [data-panel]:first-child { margin-top: 32px; }
+  [data-panel] [data-panel-head] {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 4px 12px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid var(--color-line);
+  }
+  [data-panel] [data-panel-index] {
+    font-family: var(--font-pixel);
+    font-size: 0.875rem;
+    color: var(--color-hazard);
+  }
+  [data-panel] [data-panel-head] > :is(h1, h2) {
+    margin: 0;
+    font-family: var(--font-body);
+    font-size: clamp(1.75rem, 5vw, 3rem);
+    font-weight: 700;
+    font-style: italic;
+    line-height: 1;
+    letter-spacing: -0.02em;
+    text-transform: uppercase;
+  }
+  [data-panel] [data-panel-label] {
+    margin-inline-start: auto;
+    font-family: var(--font-pixel);
+    font-size: 0.6875rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--color-ink-muted);
+  }
+  [data-panel] [data-panel-body] {
+    position: relative;
+    margin-top: 24px;
+    min-width: 0;
+    line-height: 1.6;
+  }
+  [data-panel] [data-panel-body] a { color: var(--color-accent-cyan); }
+</style>

@@ -24,33 +24,46 @@ const entries = (await getCollection('experience')).sort((a, b) => a.data.order 
 
 <ol>
   {entries.map(({ data: e }) => (
-    <li data-experience-entry>
-      <h3>{e.role[lang]}</h3>
-      <p class="company">{e.company}</p>
-      <p class="meta">
-        <span>{range(e.start, e.end)}</span>
-        <span>{[
+    <li data-experience-entry class="reveal">
+      <div class="when">
+        <p class="range">{range(e.start, e.end)}</p>
+        <p class="where">{[
           e.employment && t(`employment.${e.employment}`),
           e.arrangement && t(`arrangement.${e.arrangement}`),
           e.location,
-        ].filter(Boolean).join(' · ')}</span>
-      </p>
-      <ul class="highlights">
-        {e.highlights[lang].map((h) => <li>{h}</li>)}
-      </ul>
-      {e.skills.length > 0 && <p class="skills">{e.skills.join(' · ')}</p>}
+        ].filter(Boolean).join(' · ')}</p>
+      </div>
+      <div class="what">
+        <h3>{e.role[lang]}</h3>
+        <p class="company">{e.company}</p>
+        <ul class="highlights">
+          {e.highlights[lang].map((h) => <li>{h}</li>)}
+        </ul>
+        {e.skills.length > 0 && <p class="skills">{e.skills.join(' · ')}</p>}
+      </div>
     </li>
   ))}
 </ol>
 
 <style>
   ol { list-style: none; margin: 0; padding: 0; }
-  li[data-experience-entry] { padding: 12px 0; border-top: 1px dashed var(--color-bevel-light); }
+  li[data-experience-entry] {
+    display: grid;
+    gap: 8px 32px;
+    padding: 24px 0;
+    border-top: 1px solid var(--color-line);
+  }
   li[data-experience-entry]:first-child { border-top: 0; padding-top: 0; }
-  h3 { margin: 0; font-size: 1rem; font-weight: 600; }
-  .company { margin: 0; color: var(--color-accent-cyan); font-weight: 600; }
-  .meta { margin: 2px 0 8px; display: flex; flex-wrap: wrap; gap: 2px 12px; color: var(--color-ink-muted); font-size: 0.875rem; }
-  .highlights { margin: 0; padding-left: 1.1rem; }
-  .highlights li { margin-bottom: 6px; }
-  .skills { margin: 6px 0 0; color: var(--color-ink-muted); font-size: 0.8125rem; }
+  @media (min-width: 48rem) {
+    li[data-experience-entry] { grid-template-columns: 13rem minmax(0, 1fr); }
+  }
+  .when p { margin: 0; }
+  .range { font-family: var(--font-pixel); font-size: 0.8125rem; letter-spacing: 0.04em; color: var(--color-hazard); }
+  .where { margin-top: 4px; font-size: 0.8125rem; color: var(--color-ink-muted); }
+  h3 { margin: 0; font-size: 1.25rem; font-weight: 700; line-height: 1.2; }
+  .company { margin: 2px 0 12px; color: var(--color-accent-cyan); font-weight: 600; text-transform: uppercase; letter-spacing: 0.04em; font-size: 0.875rem; }
+  .highlights { margin: 0; padding: 0; list-style: none; }
+  .highlights li { position: relative; margin-bottom: 8px; padding-left: 1.25rem; }
+  .highlights li::before { content: '▸'; position: absolute; left: 0; color: var(--color-accent-magenta); }
+  .skills { margin: 10px 0 0; color: var(--color-ink-muted); font-family: var(--font-pixel); font-size: 0.6875rem; letter-spacing: 0.04em; }
 </style>

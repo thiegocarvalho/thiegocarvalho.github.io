@@ -13,8 +13,10 @@ const { Content } = await render(entry);
 <div class="prose"><Content /></div>
 
 <style>
-  .prose :global(p) { margin: 0 0 12px; }
-  .prose :global(ul) { margin: 0 0 12px; padding-left: 1.1rem; }
-  .prose :global(li) { margin-bottom: 6px; }
+  .prose { max-width: 48rem; }
+  .prose :global(p) { margin: 0 0 14px; }
+  .prose :global(ul) { margin: 0 0 14px; padding: 0; list-style: none; }
+  .prose :global(li) { position: relative; margin-bottom: 8px; padding-left: 1.25rem; }
+  .prose :global(li)::before { content: '▸'; position: absolute; left: 0; color: var(--color-accent-magenta); }
   .prose :global(strong) { color: var(--color-accent-cyan); font-weight: 600; }
 </style>

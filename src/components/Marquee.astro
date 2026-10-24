@@ -1,0 +1,51 @@
+---
+/** Skills strip, from the stack named in the about text. Decorative, pure CSS. */
+const words = [
+  'Distributed Systems',
+  'Event-Driven Architecture',
+  'High Concurrency',
+  'Node.js',
+  'Python',
+  'Solidity / EVM',
+  'GraphQL',
+  'Prisma',
+  'Docker',
+  'Serverless',
+  'IaC',
+  'Fintech',
+  'Payment Infrastructure',
+  'Web3',
+];
+---
+
+<div data-marquee aria-hidden="true">
+  <div class="track">
+    {[0, 1].map(() => (
+      <ul>
+        {words.map((w) => <li>{w}</li>)}
+      </ul>
+    ))}
+  </div>
+</div>
+
+<style>
+  [data-marquee] {
+    overflow: hidden;
+    border-block: 2px solid var(--color-hazard);
+    background: var(--color-surface);
+    margin-bottom: 56px;
+  }
+  .track { display: flex; width: max-content; animation: scroll 60s linear infinite; }
+  ul { display: flex; flex: none; list-style: none; margin: 0; padding: 0; }
+  li {
+    padding: 12px 0;
+    font-size: clamp(1rem, 2.4vw, 1.5rem);
+    font-weight: 700;
+    font-style: italic;
+    letter-spacing: -0.01em;
+    text-transform: uppercase;
+    white-space: nowrap;
+  }
+  li::after { content: '✦'; margin-inline: 1.25rem; color: var(--color-hazard); font-style: normal; }
+  @keyframes scroll { to { transform: translateX(-50%); } }
+</style>
