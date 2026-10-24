@@ -19,27 +19,30 @@ interface Props {
   total: number;
   /** Index of the disk the fan starts centred on. */
   start: number;
-  href: string;
+  /** Omit for the inert copy shown inside the drive on a project page. */
+  href?: string;
 }
 const { lang, slug, name, tag, index, total, start, href } = Astro.props;
 const t = useTranslations(lang);
 const o = index - start;
+const Outer = href ? 'li' : 'div';
+const Inner = href ? 'a' : 'div';
 ---
 
-<li
-  class="slot"
+<Outer
+  class:list={['slot', { standalone: !href }]}
   data-slot
   data-slug={slug}
   data-variant={index % 6}
   style={`--o:${o};--a:${Math.abs(o)};z-index:${10 - Math.abs(o)}`}
 >
-  <a
+  <Inner
     class="disk"
     href={href}
     data-disk
-    style={`view-transition-name:disk-${slug}`}
-    aria-current={index === start ? 'true' : undefined}
-    aria-label={`${name}, ${tag} (${index + 1} ${t('projects.of')} ${total})`}
+    style={`view-transition-name:disk-${slug};view-transition-class:disk`}
+    aria-current={href && index === start ? 'true' : undefined}
+    aria-label={href ? `${name}, ${tag} (${index + 1} ${t('projects.of')} ${total})` : undefined}
   >
     <span class="floppy" aria-hidden="true">
       <span class="print">3.5″ HD</span>
@@ -50,8 +53,8 @@ const o = index - start;
       </span>
       <span class="notch"></span>
     </span>
-  </a>
-</li>
+  </Inner>
+</Outer>
 
 <style>
   .slot {
@@ -63,6 +66,7 @@ const o = index - start;
   @media (scripting: none) {
     .slot { margin-inline: 8px; }
   }
+  .slot.standalone { margin-inline: 0; }
 
   .disk {
     display: block;

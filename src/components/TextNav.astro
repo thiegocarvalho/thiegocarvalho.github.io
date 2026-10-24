@@ -38,7 +38,9 @@ const items = [
 const other: Lang = lang === 'en' ? 'pt' : 'en';
 const logical = Astro.url.pathname.replace(/^\/pt(?=\/|$)/, '') || '/';
 const MIRRORED = ['/', '/blog/', '/about/'];
-const mirrored = MIRRORED.includes(logical.endsWith('/') ? logical : `${logical}/`);
+const norm = logical.endsWith('/') ? logical : `${logical}/`;
+// Every project page exists in both locales, so /projects/<slug>/ mirrors too.
+const mirrored = MIRRORED.includes(norm) || /^\/projects\/[^/]+\/$/.test(norm);
 const switchHref = localizePath(mirrored ? logical : '/', other);
 ---
 
