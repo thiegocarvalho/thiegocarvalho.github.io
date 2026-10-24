@@ -107,7 +107,8 @@ it('declares no fixed width that can overflow a 320px viewport', () => {
 it('serves English prose on / and /about/ and Portuguese prose on /pt/ and /pt/about/', () => {
   expect(readDist('about/index.html')).not.toContain('Certificação Imutável On-Chain');
   expect(readDist('pt/about/index.html')).toContain('Certificação Imutável On-Chain');
-  // 'amnesic' is in a project summary, which stays on home.
-  expect(readDist('pt/index.html')).not.toContain('Builder for an amnesic');
-  expect(readDist('index.html')).toContain('amnesic');
+  // Changed: 'amnesic' is in a project summary, which now lives only on the project page (no duplicate on home).
+  expect(readDist('pt/projects/defios/index.html')).not.toContain('Builder for an amnesic');
+  expect(readDist('projects/defios/index.html')).toContain('amnesic');
+  expect(readDist('index.html')).not.toContain('amnesic');
 });

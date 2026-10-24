@@ -5,7 +5,7 @@ import { readDist } from './helpers/dist';
 import { projectSchema } from '../src/content/schemas';
 
 const projects = globSync('src/content/projects/*.md')
-  .map((f) => projectSchema.parse(matter(readFileSync(f, 'utf8')).data))
+  .map((f) => ({ slug: basename(f, '.md'), ...projectSchema.parse(matter(readFileSync(f, 'utf8')).data) }))
   .sort((a, b) => a.order - b.order);
 
 // Text is escaped by Astro; compare against the escaped form so the check is about presence, not escaping.
@@ -21,13 +21,14 @@ describe.each([
 
   it('has six projects', () => expect(projects).toHaveLength(6));
 
-  it('renders every project name, tag, localized summary and link', () => {
+  // Changed: summary, tech and live/source links no longer repeat on home; the full description lives
+// only in the project page terminal (asserted in tests/projects.test.ts).
+  it('renders every project name and tag, links each to its project page, and does not repeat the description', () => {
     for (const p of projects) {
       expect(html, `${p.name} name`).toContain(esc(p.name));
       expect(html, `${p.name} tag`).toContain(`>${esc(p.tag)}<`);
-      expect(html, `${p.name} summary`).toContain(esc(p.summary[lang]));
-      if (p.url) expect(html, `${p.name} url`).toContain(`href="${p.url}"`);
-      if (p.repo) expect(html, `${p.name} repo`).toContain(`href="${p.repo}"`);
+      expect(html, `${p.name} summary`).not.toContain(esc(p.summary[lang]));
+      expect(html, `${p.name} link`).toContain(`href="${lang === 'pt' ? '/pt' : ''}/projects/${p.slug}/"`);
     }
   });
 
