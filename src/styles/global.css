@@ -22,6 +22,14 @@
   --font-body: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
 }
 
+/* Fan progress of the project disks: 0 stacked, 1 fanned. Registered so it can
+   be animated; the initial value is the finished state for browsers that never do. */
+@property --fan {
+  syntax: '<number>';
+  inherits: true;
+  initial-value: 1;
+}
+
 html {
   background: var(--color-void);
   color: var(--color-ink);
@@ -71,7 +79,9 @@ button:focus-visible,
 @supports (animation-timeline: view()) {
   @media (prefers-reduced-motion: no-preference) {
     .reveal {
-      animation: reveal linear both;
+      animation-name: reveal;
+      animation-timing-function: linear;
+      animation-fill-mode: both;
       animation-timeline: view();
       animation-range: entry 0% entry 70%;
     }
