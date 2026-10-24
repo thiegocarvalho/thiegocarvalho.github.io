@@ -5,6 +5,7 @@ export const ui = {
     'nav.career': 'Career',
     'nav.projects': 'Projects',
     'nav.about': 'About',
+    'nav.profile': 'Profile',
     'nav.blog': 'Blog',
     'nav.contact': 'Contact',
     'blog.empty': 'Nothing written here yet.',
@@ -41,11 +42,14 @@ export const ui = {
     'projects.track': 'Project disks. Use the arrow keys or swipe.',
     'projects.of': 'of',
     'projects.tech': 'Tech',
+    'lang.switch.en': 'English',
+    'lang.switch.pt': 'Português',
   },
   pt: {
     'nav.career': 'Carreira',
     'nav.projects': 'Projetos',
     'nav.about': 'Sobre',
+    'nav.profile': 'Perfil',
     'nav.blog': 'Blog',
     'nav.contact': 'Contato',
     'blog.empty': 'Nada escrito aqui ainda.',
@@ -79,6 +83,8 @@ export const ui = {
     'projects.track': 'Disquetes de projetos. Use as setas do teclado ou deslize.',
     'projects.of': 'de',
     'projects.tech': 'Tecnologias',
+    'lang.switch.en': 'English',
+    'lang.switch.pt': 'Português',
   },
 } as const satisfies Record<Lang, Record<string, string>>;
 

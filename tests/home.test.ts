@@ -5,24 +5,28 @@ import { allStyles, readDist } from './helpers/dist';
 const countAttr = (html: string, attr: string) =>
   (html.replace(/<style[\s\S]*?<\/style>/g, '').match(new RegExp(`<[a-z][^>]*\\s${attr}(?=[\\s=>/])`, 'g')) ?? []).length;
 
-it('renders all 13 positions on each locale home page', () => {
+// The career moved from home to the profile page, so the 13-position and
+// career assertions below now read about/index.html. Home stays short.
+it('renders all 13 positions on each locale profile page, and none on home', () => {
+  for (const page of ['about/index.html', 'pt/about/index.html']) {
+    expect(countAttr(readDist(page), 'data-experience-entry'), page).toBe(13);
+  }
   for (const page of ['index.html', 'pt/index.html']) {
-    const html = readDist(page);
-    expect(countAttr(html, 'data-experience-entry')).toBe(13);
+    expect(countAttr(readDist(page), 'data-experience-entry'), page).toBe(0);
   }
 });
 
 // Review Focus 3
 it('renders the current role as Present, never as a doubled range', () => {
-  const html = readDist('index.html');
+  const html = readDist('about/index.html');
   expect(html).toMatch(/2024\s*(—|–|-)\s*Present/);
   expect(html).not.toMatch(/Present\s*(—|–|-)\s*Present/);
-  const pt = readDist('pt/index.html');
+  const pt = readDist('pt/about/index.html');
   expect(pt).toMatch(/2024\s*(—|–|-)\s*Atual/);
   expect(pt).not.toMatch(/Atual\s*(—|–|-)\s*Atual/);
 });
 it('puts the current role first', () => {
-  const html = readDist('index.html');
+  const html = readDist('about/index.html');
   const first = html.indexOf('On-Chain Immutable Certification');
   const last = html.indexOf('CENBRACOM');
   expect(first).toBeGreaterThan(-1);
@@ -53,25 +57,34 @@ it('leads with the headline as the title, and keeps the job title in the career 
   expect(html).toMatch(/Thiego <em[^>]*>(?:"|&#34;|&quot;)Zeru(?:"|&#34;|&quot;)<\/em> Carvalho/);
   // Scoped to the visible hero. The meta description still names his current
   // role, which is the right copy for a search snippet.
-  const hero = html.slice(html.indexOf('data-hero'), html.indexOf('data-marquee'));
+  const hero = html.slice(html.indexOf('data-hero'), html.indexOf('id="projects"'));
   expect(hero).toContain('OSASCO/SP');
   expect(hero).not.toMatch(/CTO/);
-  expect(html.slice(html.indexOf('id="career"'))).toMatch(/CTO &amp; Partner/);
+  const about = readDist('about/index.html');
+  expect(about.slice(about.indexOf('id="career"'))).toMatch(/CTO &amp; Partner/);
 });
 
-it('renders the about prose in each locale', () => {
-  expect(readDist('index.html')).toContain('1998');
-  expect(readDist('pt/index.html')).toContain('1998');
+it('renders the about prose on the profile page in each locale', () => {
+  expect(readDist('about/index.html')).toContain('1998');
+  expect(readDist('pt/about/index.html')).toContain('1998');
 });
 
-it('always renders the text navigation, pointing at every section', () => {
+it('keeps home to hero, projects and contact', () => {
+  for (const page of ['index.html', 'pt/index.html']) {
+    const html = readDist(page);
+    const ids = [...html.matchAll(/<section\b[^>]*\bid="([^"]+)"/g)].map((m) => m[1]);
+    expect(ids, page).toEqual(['top', 'projects', 'contact']);
+  }
+});
+
+it('always renders the text navigation, pointing at every destination', () => {
   // Section links carry the locale's home path rather than a bare hash, so
   // that the same nav still resolves from /blog/. See tests/nav.test.ts.
   for (const [page, home] of [['index.html', '/'], ['pt/index.html', '/pt/']] as const) {
     const html = readDist(page);
     expect(html).toMatch(/<nav[^>]*data-text-nav/);
-    for (const id of ['career', 'projects', 'about', 'contact'])
-      expect(html, `${page} ${id}`).toContain(`href="${home}#${id}"`);
+    for (const id of ['projects', 'contact']) expect(html, `${page} ${id}`).toContain(`href="${home}#${id}"`);
+    expect(html, page).toContain(`href="${home}about/"`.replace('//', '/'));
   }
 });
 
@@ -91,9 +104,10 @@ it('declares no fixed width that can overflow a 320px viewport', () => {
 });
 
 // The regression that started Task 6b: prose must follow the page's locale.
-it('serves English prose on / and Portuguese prose on /pt', () => {
-  expect(readDist('index.html')).not.toContain('Certificação Imutável On-Chain');
-  expect(readDist('pt/index.html')).toContain('Certificação Imutável On-Chain');
+it('serves English prose on / and /about/ and Portuguese prose on /pt/ and /pt/about/', () => {
+  expect(readDist('about/index.html')).not.toContain('Certificação Imutável On-Chain');
+  expect(readDist('pt/about/index.html')).toContain('Certificação Imutável On-Chain');
+  // 'amnesic' is in a project summary, which stays on home.
   expect(readDist('pt/index.html')).not.toContain('Builder for an amnesic');
   expect(readDist('index.html')).toContain('amnesic');
 });

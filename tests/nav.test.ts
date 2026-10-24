@@ -1,4 +1,4 @@
-import { allHtml, readDist } from './helpers/dist';
+import { allHtml, allStyles, readDist } from './helpers/dist';
 
 // TextNav is primary navigation on every page, so its section links have to
 // resolve from pages that do not contain those sections. A bare "#career" on
@@ -12,7 +12,7 @@ describe('text navigation', () => {
   });
 
   it('never leaves a bare hash link that cannot resolve off the home page', () => {
-    for (const page of ['blog/index.html', 'pt/blog/index.html']) {
+    for (const page of ['blog/index.html', 'pt/blog/index.html', 'about/index.html', 'pt/about/index.html']) {
       const html = readDist(page);
       const nav = html.slice(html.indexOf('data-text-nav'));
       const navEnd = nav.indexOf('</nav>');
@@ -21,13 +21,39 @@ describe('text navigation', () => {
     }
   });
 
-  it('points section links at the right locale home', () => {
-    const en = readDist('blog/index.html');
-    const pt = readDist('pt/blog/index.html');
-    for (const section of ['career', 'projects', 'about', 'contact']) {
-      expect(en, `en ${section}`).toContain(`href="/#${section}"`);
-      expect(pt, `pt ${section}`).toContain(`href="/pt/#${section}"`);
+  it('resolves every nav link from every page, in the right locale', () => {
+    // Projects/contact are sections of the home page, so they carry the home path
+    // (not a bare hash); profile and blog are real routes.
+    for (const { path, html } of allHtml()) {
+      const pt = path.startsWith('pt/');
+      const nav = html.slice(html.indexOf('data-text-nav'), html.indexOf('</nav>'));
+      const home = pt ? '/pt/' : '/';
+      for (const href of [`${home}#projects`, `${home}#contact`, `${home}about/`, `${home}blog/`]) {
+        expect(nav, `${path} -> ${href}`).toContain(`href="${href}"`);
+      }
     }
+  });
+
+  it('has no leftover career/about section links', () => {
+    for (const { path, html } of allHtml()) {
+      const nav = html.slice(html.indexOf('data-text-nav'), html.indexOf('</nav>'));
+      expect(nav, path).not.toMatch(/#career|#about/);
+    }
+  });
+
+  it('marks the current page in the nav', () => {
+    expect(readDist('about/index.html')).toMatch(/href="\/about\/"[^>]*aria-current="page"/);
+    expect(readDist('pt/about/index.html')).toMatch(/href="\/pt\/about\/"[^>]*aria-current="page"/);
+    expect(readDist('blog/index.html')).toMatch(/href="\/blog\/"[^>]*aria-current="page"/);
+  });
+
+  it('keeps the nav as one row on phones, with the language switch shortened but still named', () => {
+    // The phone layout drops wrapping and shortens the switch to a code; the
+    // full language name stays on the link as its accessible name.
+    const nav = readDist('about/index.html');
+    expect(nav).toMatch(/data-lang-switch[\s\S]{0,260}aria-label="Português"/);
+    expect(readDist('pt/about/index.html')).toMatch(/data-lang-switch[\s\S]{0,260}aria-label="English"/);
+    expect(allStyles()).not.toMatch(/nav[^{]*\{[^}]*flex-wrap:\s*wrap/);
   });
 
   it('links each locale at its own blog index', () => {
@@ -51,6 +77,11 @@ describe('language switch', () => {
     expect(readDist('pt/index.html')).toMatch(/data-lang-switch[\s\S]{0,120}href="\/"/);
     expect(readDist('blog/index.html')).toMatch(/data-lang-switch[\s\S]{0,120}href="\/pt\/blog\/"/);
     expect(readDist('pt/blog/index.html')).toMatch(/data-lang-switch[\s\S]{0,120}href="\/blog\/"/);
+  });
+
+  it('maps /about/ and /pt/about/ onto each other', () => {
+    expect(readDist('about/index.html')).toMatch(/data-lang-switch[\s\S]{0,120}href="\/pt\/about\/"/);
+    expect(readDist('pt/about/index.html')).toMatch(/data-lang-switch[\s\S]{0,120}href="\/about\/"/);
   });
 
   it('falls back to the other locale home for a page with no counterpart', () => {

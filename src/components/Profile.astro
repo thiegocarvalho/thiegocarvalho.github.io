@@ -1,0 +1,35 @@
+---
+/** The profile page for one locale: about text, then the full career. Zero JS. */
+import { getCollection } from 'astro:content';
+import Base from '../layouts/Base.astro';
+import Panel from './Panel.astro';
+import Marquee from './Marquee.astro';
+import TextNav from './TextNav.astro';
+import ExperienceList from './ExperienceList.astro';
+import AboutPanel from './AboutPanel.astro';
+import SiteFooter from './SiteFooter.astro';
+import { useTranslations } from '../i18n/utils';
+import type { Lang } from '../i18n/ui';
+
+interface Props {
+  lang: Lang;
+  description: string;
+}
+const { lang, description } = Astro.props;
+const t = useTranslations(lang);
+const positions = (await getCollection('experience')).length;
+---
+
+<Base title={`${t('nav.profile')} — Thiego "Zeru" Carvalho`} description={description} lang={lang} path="/about/">
+  <TextNav lang={lang} current="profile" />
+  <main>
+    <Panel heading="h1" title={t('nav.profile')} id="profile" index="01" label="FILE 001-ZERU">
+      <AboutPanel lang={lang} />
+    </Panel>
+    <Marquee />
+    <Panel title={t('nav.career')} id="career" index="02" label={`${positions} ${t('hud.positions')}`}>
+      <ExperienceList lang={lang} />
+    </Panel>
+  </main>
+  <SiteFooter lang={lang} />
+</Base>

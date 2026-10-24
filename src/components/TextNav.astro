@@ -20,8 +20,7 @@ const t = useTranslations(lang);
 const home = localizePath('/', lang);
 const items = [
   { id: 'projects', href: `${home}#projects`, label: t('nav.projects') },
-  { id: 'career', href: `${home}#career`, label: t('nav.career') },
-  { id: 'about', href: `${home}#about`, label: t('nav.about') },
+  { id: 'profile', href: localizePath('/about/', lang), label: t('nav.profile') },
   { id: 'blog', href: localizePath('/blog/', lang), label: t('nav.blog') },
   { id: 'contact', href: `${home}#contact`, label: t('nav.contact') },
 ];
@@ -38,7 +37,8 @@ const items = [
  */
 const other: Lang = lang === 'en' ? 'pt' : 'en';
 const logical = Astro.url.pathname.replace(/^\/pt(?=\/|$)/, '') || '/';
-const mirrored = logical === '/' || logical === '/blog/' || logical === '/blog';
+const MIRRORED = ['/', '/blog/', '/about/'];
+const mirrored = MIRRORED.includes(logical.endsWith('/') ? logical : `${logical}/`);
 const switchHref = localizePath(mirrored ? logical : '/', other);
 ---
 
@@ -49,8 +49,9 @@ const switchHref = localizePath(mirrored ? logical : '/', other);
       <li><a href={i.href} aria-current={current === i.id ? 'page' : undefined}>{i.label}</a></li>
     ))}
     <li data-lang-switch>
-      <a href={switchHref} hreflang={other === 'pt' ? 'pt-br' : 'en'} lang={other === 'pt' ? 'pt-br' : 'en'}>
-        {other === 'pt' ? 'Português' : 'English'}
+      <a href={switchHref} hreflang={other === 'pt' ? 'pt-br' : 'en'} lang={other === 'pt' ? 'pt-br' : 'en'} aria-label={t(`lang.switch.${other}`)}>
+        <span class="long">{t(`lang.switch.${other}`)}</span>
+        <span class="short" aria-hidden="true">{other.toUpperCase()}</span>
       </a>
     </li>
   </ul>
@@ -59,18 +60,16 @@ const switchHref = localizePath(mirrored ? logical : '/', other);
 <style>
   nav {
     display: flex;
-    flex-wrap: wrap;
     align-items: center;
     gap: 4px 20px;
-    padding: 10px 16px;
+    padding: 6px 16px;
     background: rgb(5 5 7 / 0.92);
     border-bottom: 1px solid var(--color-line);
     z-index: 20;
   }
   @media (min-width: 48rem) {
-    nav { position: sticky; top: 0; padding-inline: max(16px, calc((100% - 72rem) / 2 + 16px)); }
+    nav { position: sticky; top: 0; padding-block: 10px; padding-inline: max(16px, calc((100% - 72rem) / 2 + 16px)); }
   }
-  @media (max-width: 47.99rem) { .brand { display: none; } li a { padding-inline: 6px; font-size: 0.6875rem; } nav { padding-inline: 10px; } }
   .brand {
     font-family: var(--font-body);
     font-weight: 700;
@@ -81,7 +80,7 @@ const switchHref = localizePath(mirrored ? logical : '/', other);
     text-decoration: none;
   }
   .brand span { color: var(--color-hazard); }
-  ul { display: flex; flex: 1; flex-wrap: wrap; gap: 0 4px; list-style: none; margin: 0; padding: 0; }
+  ul { display: flex; flex: 1; min-width: 0; gap: 0 4px; list-style: none; margin: 0; padding: 0; }
   li a {
     display: block;
     padding: 8px 8px;
@@ -98,4 +97,17 @@ const switchHref = localizePath(mirrored ? logical : '/', other);
   [data-lang-switch] { margin-inline-start: auto; }
   [data-lang-switch] a { color: var(--color-accent-magenta); text-transform: none; }
   [data-lang-switch] a:hover { color: var(--color-ink); }
+  .short { display: none; }
+  /* Phone: one compact row. The brand is dropped (the first link is the home
+     section) and the language switch shortens to its code; its full name stays
+     on the link as aria-label. */
+  @media (max-width: 47.99rem) {
+    .brand { display: none; }
+    nav { padding-inline: 8px; }
+    ul { gap: 0; }
+    li a { padding-inline: 7px; font-size: 0.6875rem; letter-spacing: 0.02em; }
+    .long { display: none; }
+    .short { display: inline; }
+    [data-lang-switch] a { text-transform: uppercase; }
+  }
 </style>

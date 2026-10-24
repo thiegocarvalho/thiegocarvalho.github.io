@@ -6,7 +6,7 @@ describe('HUD panel markup', () => {
   it('renders each panel as a real <section> labelled by its heading', () => {
     // Replaces the Win3.11 window-markup assertion: the invariant is semantic structure, not bevels.
     const sections = [...page().matchAll(/<section\b[^>]*\bdata-panel\b[^>]*>([\s\S]*?)<\/section>/g)];
-    expect(sections.length).toBe(4);
+    expect(sections.length).toBe(2); // home is now projects + contact
     for (const m of sections) {
       expect(m[0]).toMatch(/aria-labelledby="([^"]+)"/);
       expect(m[1]).toMatch(/<h2\b[^>]*>\s*[^<\s][^<]*<\/h2>/);
@@ -15,7 +15,7 @@ describe('HUD panel markup', () => {
 
   it('numbers the sections in the dossier voice, hidden from assistive tech', () => {
     const html = page();
-    for (const n of ['01', '02', '03', '04']) expect(html).toMatch(new RegExp(`data-panel-index[^>]*aria-hidden="true"[^>]*>// ${n} —`));
+    for (const n of ['01', '02']) expect(html).toMatch(new RegExp(`data-panel-index[^>]*aria-hidden="true"[^>]*>// ${n} —`));
   });
 
   it('keeps the Windows 3.11 chrome out of every page', () => {
@@ -34,9 +34,11 @@ describe('HUD hero', () => {
     expect(readDist('pt/index.html')).toContain('STATUS: DISPONÍVEL');
   });
 
-  it('draws the skills marquee and hazard stripe as decoration, not content', () => {
+  it('draws the skills marquee (profile page) and hazard stripe as decoration, not content', () => {
+    // The marquee moved with the about text to the profile page; home keeps only the stripe.
     const html = page();
-    expect(html).toMatch(/data-marquee[^>]*aria-hidden="true"/);
+    expect(readDist('about/index.html')).toMatch(/data-marquee[^>]*aria-hidden="true"/);
+    expect(html).not.toMatch(/data-marquee/);
     expect(html).toMatch(/class="hazard"[^>]*aria-hidden="true"|aria-hidden="true"[^>]*class="hazard"/);
   });
 });

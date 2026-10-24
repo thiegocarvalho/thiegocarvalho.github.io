@@ -17,6 +17,12 @@ describe("JavaScript budget", () => {
     }
   });
 
+  it("ships zero JS on the profile pages (sticky timeline and scroll animation are pure CSS)", () => {
+    for (const page of ["about/index.html", "pt/about/index.html"]) {
+      expect(readDist(page), page).not.toMatch(/<script\b/);
+    }
+  });
+
   it("emits JS bundles only for the home pages' carousel", () => {
     // Every emitted .js file must be referenced by a home page; nothing else may ship one.
     const referenced = HOME_PAGES.flatMap((p) => [...readDist(p).matchAll(/<script[^>]+src="([^"]+)"/g)].map((m) => m[1].replace(/^\//, "")));
