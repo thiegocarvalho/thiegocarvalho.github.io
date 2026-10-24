@@ -68,7 +68,10 @@ describe("JavaScript budget", () => {
     }
   });
 
-  it("keeps total CSS under 60kb", () => {
-    expect(Buffer.byteLength(allStyles())).toBeLessThan(60_000);
+  // Raised from 60kb when the contribution graph, the CRT power switch and the 3D rotary phone
+  // landed (the cursor paths were compacted first to make room). The home page itself loads
+  // about 46kb of it uncompressed, ~10kb over the wire.
+  it("keeps total CSS under 64kb", () => {
+    expect(Buffer.byteLength(allStyles())).toBeLessThan(64_000);
   });
 });
