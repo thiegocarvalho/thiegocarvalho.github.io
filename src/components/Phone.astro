@@ -1,0 +1,67 @@
+---
+/**
+ * An old desk telephone beside the contact call to action, built from the
+ * same 3D box kit as the hero's CRT (global.css): a base with a keypad on
+ * top, a raised cradle at the back, the handset resting across it and a
+ * coiled cord down the right flank. Decorative only.
+ */
+// the coiled cord: a tight wave along the line from the handset to the base
+const coil = Array.from({ length: 73 }, (_, i) => {
+  const k = i / 72;
+  const x = 92 - k * 80;
+  const y = 6 + k * 46 + Math.sin(i * 1.6) * 4;
+  return `${i ? 'L' : 'M'}${x.toFixed(1)} ${y.toFixed(1)}`;
+}).join('');
+---
+
+<div class="phone" aria-hidden="true">
+  <div class="set">
+    <span class="box base">
+      <i class="fr"></i><i class="tp"></i><i class="sd"></i><i class="keys"></i>
+      <svg class="cord" viewBox="0 0 100 60"><path d={coil} /></svg>
+    </span>
+    <span class="box cradle"><i class="fr"></i><i class="tp"></i><i class="sd"></i></span>
+    <span class="box bar"><i class="fr"></i><i class="tp"></i><i class="sd"></i></span>
+    <span class="box cup"><i class="fr"></i><i class="tp"></i><i class="sd"></i></span>
+    <span class="box cup r"><i class="fr"></i><i class="tp"></i><i class="sd"></i></span>
+  </div>
+</div>
+
+<style>
+  /* depths in cqw of .phone, so the set scales with its column */
+  .phone { container-type: inline-size; width: 100%; max-width: min(28rem, 82vw); padding: 30cqw 0 10cqw; }
+  .set {
+    position: relative;
+    width: 66cqw;
+    height: 14cqw;
+    margin-left: 10cqw;
+    transform-style: preserve-3d;
+    transform: perspective(1800px) rotateX(-28deg) rotateY(-32deg);
+  }
+  .base { inset: 0; --d: 48cqw; }
+  .base > .fr { box-shadow: 0 18px 28px rgb(0 0 0 / 0.7); }
+  /* twelve square keys on the front of the top deck */
+  .keys {
+    left: 30%;
+    bottom: 100%;
+    width: 40%;
+    height: 20cqw;
+    transform-origin: 50% 100%;
+    transform: rotateX(90deg) translateY(-3cqw) translateZ(0.3cqw);
+    /* light keys separated by dark gaps: two stripe layers over the key colour */
+    background:
+      linear-gradient(90deg, #57523f 0 14%, transparent 14% 86%, #57523f 86%) 0 0 / 33.4% 25%,
+      linear-gradient(#57523f 0 14%, transparent 14% 86%, #57523f 86%) 0 0 / 33.4% 25%,
+      #f1ebd8;
+    outline: 0.8cqw solid #57523f;
+  }
+  .cradle { left: 6%; top: -8cqw; width: 88%; height: 8cqw; --d: 18cqw; transform: translateZ(-27cqw); }
+  /* the handset: a grip across the cradle with an earpiece and mouthpiece at the ends */
+  .bar { left: 4%; top: -11.5cqw; width: 92%; height: 3.5cqw; --d: 7cqw; transform: translateZ(-32.5cqw); }
+  .cup { left: -2%; top: -15cqw; width: 20%; height: 8cqw; --d: 13cqw; transform: translateZ(-29.5cqw); }
+  /* the handset a shade darker than the base, so it reads as its own part */
+  .bar > i, .cup > i { filter: brightness(0.8); }
+  .cup.r { left: 82%; }
+  .cord { position: absolute; left: 100%; top: -8cqw; width: 40cqw; height: 24cqw; transform-origin: 0 50%; transform: rotateY(90deg) translateZ(0.4cqw); overflow: visible; }
+  .cord path { fill: none; stroke: #4e4a3c; stroke-width: 1.6; stroke-linejoin: round; }
+</style>

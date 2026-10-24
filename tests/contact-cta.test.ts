@@ -39,3 +39,14 @@ describe('contact CTA in the footer', () => {
     }
   });
 });
+
+describe("the contact phone", () => {
+  it("sits inside the contact CTA on every page, decorative and script-free", () => {
+    for (const { path, html } of allHtml()) {
+      const cta = html.match(/<section[^>]*id="contact"[\s\S]*?<\/section>/)![0];
+      expect(cta, path).toMatch(/<div class="phone[^"]*" aria-hidden="true"/);
+      expect(cta, path).toMatch(/class="box base/);
+      expect(cta, path).not.toContain("<script");
+    }
+  });
+});
