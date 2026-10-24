@@ -136,8 +136,7 @@ button:focus-visible,
 /*
  * Cross-document view transitions: a plain link navigation between two pages
  * of this site morphs elements that share a view-transition-name (the floppy
- * disk, `disk-<slug>`, on the home carousel and in the project page's drive)
- * and crossfades the rest. Browsers without support just navigate. Off under
+ * disk, `disk-<slug>`, on the home carousel and in the project page's drive). Browsers without support just navigate. Off under
  * reduced motion.
  */
 @media (prefers-reduced-motion: no-preference) {
@@ -145,45 +144,12 @@ button:focus-visible,
     navigation: auto;
   }
 }
+/* Only the disk moves: the rest of the page swaps at once, so ordinary link
+   clicks feel like plain navigation. */
 ::view-transition-old(root),
 ::view-transition-new(root) {
-  animation-duration: 0.4s;
+  animation: none;
 }
-/*
- * Channel switch for ordinary page-to-page navigation (no disk involved; the
- * shared script puts `ch` on <html> only then, and drops it afterwards): the
- * old page collapses to a horizontal line like a CRT switching off, then the
- * new one opens from a line through a flash of static. About 330ms in all.
- * Pages with a disk morph never get `ch`, so they keep the plain crossfade.
- */
-@keyframes ch-off {
-  0% { transform: scaleY(1); filter: brightness(1); opacity: 1; }
-  70% { transform: scaleY(0.012); filter: brightness(3); opacity: 1; }
-  100% { transform: scale(0, 0.012); filter: brightness(3); opacity: 0; }
-}
-@keyframes ch-on {
-  0% { transform: scaleY(0.012); filter: brightness(3) saturate(0); }
-  45% { transform: scaleY(1); filter: brightness(1.8) saturate(0.4); }
-  100% { transform: none; filter: none; }
-}
-@keyframes ch-static { 0% { opacity: 0; } 30% { opacity: 0.5; } 100% { opacity: 0; } }
-@media (prefers-reduced-motion: no-preference) {
-  html.ch [data-disk] { view-transition-name: none !important; }
-  html.ch::view-transition-group(root) {
-    animation-duration: 0.33s;
-    background: #050507 url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence baseFrequency='.9' numOctaves='1' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .6 0 0 0 0 .9 0 0 0 0 1 0 0 0 1.4 -.35'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)'/%3E%3C/svg%3E");
-  }
-  html.ch::view-transition-image-pair(root) { isolation: auto; }
-  html.ch::view-transition-old(root) {
-    animation: ch-off 0.12s cubic-bezier(0.5, 0, 0.9, 0.6) both;
-    mix-blend-mode: normal;
-  }
-  html.ch::view-transition-new(root) {
-    animation: ch-on 0.21s 0.12s cubic-bezier(0.2, 0.7, 0.3, 1) both;
-    mix-blend-mode: normal;
-  }
-}
-
 /* Pixel mouse. Arrow for the page, hand for anything clickable, I-beam for text
    fields; each is a small SVG pixel grid (black outline, white and cyan fill,
    hotspot on the tip). The keyword after the comma is the fallback. */

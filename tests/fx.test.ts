@@ -1,7 +1,7 @@
 import { gzipSync } from "node:zlib";
 import { allHtml, allStyles } from "./helpers/dist";
 
-const fxTag = (html: string) => [...html.matchAll(/<script\b([^>]*)>([\s\S]*?)<\/script>/g)].find((m) => /blocking=["']render["']/.test(m[1]));
+const fxTag = (html: string) => [...html.matchAll(/<script\b([^>]*)>([\s\S]*?)<\/script>/g)].find((m) => /\bdata-fx\b/.test(m[1]));
 
 describe("pixel cursors", () => {
   const css = allStyles();
@@ -21,7 +21,7 @@ describe("pixel cursors", () => {
   });
 });
 
-describe("shared fx script (pointer trail + channel switch hook)", () => {
+describe("shared fx script (pointer trail)", () => {
   it("is on every page as an inline type=module, <= 1 KB gzipped", () => {
     for (const { path, html } of allHtml()) {
       const t = fxTag(html);
@@ -53,10 +53,10 @@ describe("section transitions", () => {
     expect(css).toMatch(/animation-fill-mode:\s*backwards/);
     expect(css).not.toMatch(/\.reveal\b/);
   });
-  it("plays a channel switch only when `ch` is set, inside no-preference", () => {
-    expect(css).toMatch(/@keyframes ch-off/);
-    expect(css).toMatch(/html\.ch::view-transition-old\(root\)/);
-    expect(css).toMatch(/@media\s*\(prefers-reduced-motion:\s*no-preference\)\s*\{\s*html\.ch \[data-disk\]/);
+  it("animates nothing on ordinary link clicks: no channel switch, no root crossfade", () => {
+    expect(css).not.toMatch(/ch-off|html\.ch\b/);
+    expect(css).toMatch(/::view-transition-old\(root\),\s*::view-transition-new\(root\)\s*\{\s*animation:\s*none/);
+    for (const { path, html } of allHtml()) expect(fxTag(html)![2], path).not.toMatch(/pageswap|pagereveal/);
   });
   it("keeps the disk morph untouched", () => {
     const group = css.match(/::view-transition-group\(\*\.disk\)\s*\{([^}]*)\}/)![1];
@@ -66,7 +66,5 @@ describe("section transitions", () => {
     expect(css).toMatch(/@view-transition\s*\{\s*navigation:\s*auto/);
     const home = allHtml().find((p) => p.path === "index.html")!.html;
     expect(home).toMatch(/view-transition-name:\s*disk-gramovoice/);
-    // the channel switch drops the names only under html.ch, which the script never sets for project pages
-    expect(fxTag(home)![2]).toContain("projects");
   });
 });

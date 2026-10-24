@@ -1,15 +1,15 @@
 import { gzipSync } from "node:zlib";
 import { allHtml, allStyles, distFiles, readDist } from "./helpers/dist";
 
-// Script budget: every page carries the one shared pointer-trail/channel-switch module (<= 1 KB gz,
+// Script budget: every page carries the one shared pointer-trail module (<= 1 KB gz,
 // see fx.test.ts); the two home pages add the floppy carousel; the project pages add one tiny
 // inline eject script (<= 1 KB gzipped, asserted below). Nothing else ships JS.
 const HOME_PAGES = ["index.html", "pt/index.html"];
 
 const allScriptTags = (html: string) =>
   [...html.matchAll(/<script\b([^>]*)>([\s\S]*?)<\/script>/g)].map((m) => ({ attrs: m[1], body: m[2] }));
-// The shared fx script is inline and carries blocking="render"; everything else is counted by the tests below.
-const isFx = (t: { attrs: string }) => /blocking=["']render["']/.test(t.attrs);
+// The shared fx script is inline and marked data-fx; everything else is counted by the tests below.
+const isFx = (t: { attrs: string }) => /\bdata-fx\b/.test(t.attrs);
 const scriptTags = (html: string) => allScriptTags(html).filter((t) => !isFx(t));
 const isExecutable = (attrs: string) => !/type=["']?(application\/ld\+json|application\/json)/.test(attrs);
 

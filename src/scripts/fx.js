@@ -1,7 +1,4 @@
-const d=document.documentElement,p=u=>/\/projects\//.test(u),c=d.classList
-addEventListener('pageswap',e=>{const u=e.activation?.entry?.url;u&&!p(u)&&!p(location.href)&&c.add('ch')})
-addEventListener('pagereveal',e=>{const f=navigation.activation?.from?.url,t=e.viewTransition;f&&t&&!p(f)&&!p(location.href)&&(c.add('ch'),t.finished.finally(()=>c.remove('ch')))})
-addEventListener('pageshow',e=>e.persisted&&c.remove('ch'))
+const d=document.documentElement
 if(matchMedia('(pointer:fine)').matches&&!matchMedia('(prefers-reduced-motion:reduce)').matches){const b=document.createElement('div'),s=[];let x,y,r
 b.className='trail';b.setAttribute('aria-hidden','true')
 for(let i=0;i<6;i++){const e=document.createElement('i');e.style.opacity=1-i*.15;s.push({e,x:0,y:0});b.append(e)}

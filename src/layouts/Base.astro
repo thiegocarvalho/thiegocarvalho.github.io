@@ -53,8 +53,8 @@ const alternates = alternatesFor(path, availableLangs);
     <link rel="preload" href={silkscreenUrl} as="font" type="font/woff2" crossorigin />
     <link rel="preload" href={plexUrl} as="font" type="font/woff2" crossorigin />
     <slot name="head" />
-    {/* Shared decorative script: pointer trail and the channel-switch hook. Render-blocking so the pagereveal listener exists before the first frame; it is tiny and inline. */}
-    <script is:inline type="module" {...{ blocking: "render" }} set:html={fx} />
+    {/* Shared decorative script: the pointer trail. Tiny and inline. */}
+    <script is:inline type="module" data-fx set:html={fx} />
   </head>
   <body>
     <slot />
