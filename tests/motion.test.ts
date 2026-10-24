@@ -52,6 +52,5 @@ it('falls back to the finished fan where scroll-driven animation is unsupported'
 
 it('keeps the career year column sticky and the profile page script-free', () => {
   expect(allStyles()).toMatch(/\.when[^{]*\{[^}]*position:\s*sticky/);
-  // Changed: the shared fx module is the only script the profile page may carry.
-  expect(readDist('about/index.html').match(/<script\b/g)).toHaveLength(1);
+  expect(readDist('about/index.html')).not.toMatch(/<script\b/);
 });

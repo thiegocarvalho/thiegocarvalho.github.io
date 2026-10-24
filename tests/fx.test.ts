@@ -1,7 +1,5 @@
-import { gzipSync } from "node:zlib";
 import { allHtml, allStyles } from "./helpers/dist";
 
-const fxTag = (html: string) => [...html.matchAll(/<script\b([^>]*)>([\s\S]*?)<\/script>/g)].find((m) => /\bdata-fx\b/.test(m[1]));
 
 describe("pixel cursors", () => {
   const css = allStyles();
@@ -21,29 +19,6 @@ describe("pixel cursors", () => {
   });
 });
 
-describe("shared fx script (pointer trail)", () => {
-  it("is on every page as an inline type=module, <= 1 KB gzipped", () => {
-    for (const { path, html } of allHtml()) {
-      const t = fxTag(html);
-      expect(t, path).toBeTruthy();
-      expect(t![1], path).toMatch(/type=["']module["']/);
-      expect(gzipSync(t![2]).length, path).toBeLessThanOrEqual(1024);
-    }
-  });
-  it("guards on fine pointers and reduced motion, passively, before attaching anything", () => {
-    const body = fxTag(allHtml()[0].html)![2];
-    expect(body).toContain("(pointer:fine)");
-    expect(body).toContain("prefers-reduced-motion:reduce");
-    expect(body).toMatch(/pointermove[\s\S]*passive:\s*true/);
-    expect(body).toContain("requestAnimationFrame");
-    expect(body).toContain("aria-hidden");
-    expect(body.indexOf("(pointer:fine)")).toBeLessThan(body.indexOf("pointermove"));
-  });
-  it("styles the trail as non-interactive and transform-driven", () => {
-    expect(allStyles()).toMatch(/\.trail\s*\{[^}]*pointer-events:\s*none/);
-  });
-});
-
 describe("section transitions", () => {
   const css = allStyles();
   it("reveals panels and the footer CTA with a scroll-driven scan, as longhands inside no-preference", () => {
@@ -56,7 +31,8 @@ describe("section transitions", () => {
   it("animates nothing on ordinary link clicks: no channel switch, no root crossfade", () => {
     expect(css).not.toMatch(/ch-off|html\.ch\b/);
     expect(css).toMatch(/::view-transition-old\(root\),\s*::view-transition-new\(root\)\s*\{\s*animation:\s*none/);
-    for (const { path, html } of allHtml()) expect(fxTag(html)![2], path).not.toMatch(/pageswap|pagereveal/);
+    expect(css).not.toMatch(/\.trail\b/);
+    for (const { path, html } of allHtml()) expect(html, path).not.toMatch(/pagereveal|class="trail/);
   });
   it("keeps the disk morph untouched", () => {
     const group = css.match(/::view-transition-group\(\*\.disk\)\s*\{([^}]*)\}/)![1];
