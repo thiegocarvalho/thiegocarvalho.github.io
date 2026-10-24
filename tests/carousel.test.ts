@@ -31,12 +31,13 @@ describe.each([
     }
   });
 
-  it('draws one floppy per project, each a real link to its details', () => {
+  // Changed in part 2: disks used to link to on-page #project-<slug> anchors; they now link to the project pages.
+  it('draws one floppy per project, each a real link to its project page', () => {
     const disks = [...html.matchAll(/<a[^>]*\bdata-disk\b[^>]*>/g)].map((m) => m[0]);
     expect(disks).toHaveLength(6);
     for (const d of disks) {
-      const target = d.match(/href="#([^"]+)"/)![1];
-      expect(html).toContain(`id="${target}"`);
+      const target = d.match(/href="([^"]+)"/)![1];
+      expect(target).toMatch(lang === 'pt' ? /^\/pt\/projects\/[a-z0-9-]+\/$/ : /^\/projects\/[a-z0-9-]+\/$/);
     }
   });
 

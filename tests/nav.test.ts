@@ -84,6 +84,11 @@ describe('language switch', () => {
     expect(readDist('pt/about/index.html')).toMatch(/data-lang-switch[\s\S]{0,120}href="\/about\/"/);
   });
 
+  it('maps /projects/<slug>/ and /pt/projects/<slug>/ onto each other', () => {
+    expect(readDist('projects/defios/index.html')).toMatch(/data-lang-switch[\s\S]{0,120}href="\/pt\/projects\/defios\/"/);
+    expect(readDist('pt/projects/defios/index.html')).toMatch(/data-lang-switch[\s\S]{0,120}href="\/projects\/defios\/"/);
+  });
+
   it('falls back to the other locale home for a page with no counterpart', () => {
     // The Portuguese post has no English translation, so the English URL for
     // it was never built; linking to it would turn a missing translation into

@@ -59,7 +59,9 @@ export function allStyles(): string {
   const inline = allHtml().flatMap(({ html }) =>
     [...html.matchAll(/<style\b[^>]*>([\s\S]*?)<\/style>/gi)].map((m) => m[1]),
   );
-  const css = [...emitted, ...inline].join("\n");
+  // Identical inline blocks repeat on every page that uses the same component (e.g. the floppy
+  // on home and 12 project pages); the corpus is the distinct rules, not the per-page copies.
+  const css = [...new Set([...emitted, ...inline])].join("\n");
   if (css.trim() === "") {
     throw new Error(
       "allStyles(): no CSS found in dist/ (no .css files and no inline <style> tags). " +

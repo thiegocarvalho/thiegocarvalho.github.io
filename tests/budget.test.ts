@@ -23,6 +23,12 @@ describe("JavaScript budget", () => {
     }
   });
 
+  it("ships zero JS on all 12 project pages (the drive and terminal sequence is pure CSS)", () => {
+    const pages = distFiles("**/projects/*/index.html");
+    expect(pages).toHaveLength(12);
+    for (const page of pages) expect(readDist(page), page).not.toMatch(/<script\b/);
+  });
+
   it("emits JS bundles only for the home pages' carousel", () => {
     // Every emitted .js file must be referenced by a home page; nothing else may ship one.
     const referenced = HOME_PAGES.flatMap((p) => [...readDist(p).matchAll(/<script[^>]+src="([^"]+)"/g)].map((m) => m[1].replace(/^\//, "")));
